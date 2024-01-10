@@ -41,7 +41,7 @@ export default function DashboardContent() {
 
   useEffect(() => {
     // Fetch humidity and temperature data from API
-    fetch("http://localhost:8082/api/v1/data")
+    fetch("https://backfood.tfdatamaster.com/api/v1/data")
       .then((response) => response.json())
       .then((data) => {})
       .catch((error) => {

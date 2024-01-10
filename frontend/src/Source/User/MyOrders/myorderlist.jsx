@@ -9,7 +9,7 @@ const OrderList = () => {
       try {
         const email = localStorage.getItem("userEmail");
         const response = await fetch(
-          `http://localhost:8082/api/v1/getuserorders/${email}`
+          `https://backfood.tfdatamaster.com/api/v1/getuserorders/${email}`
         );
         if (response.ok) {
           const data = await response.json();

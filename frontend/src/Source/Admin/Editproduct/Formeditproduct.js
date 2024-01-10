@@ -116,13 +116,16 @@ export default function FormEditProduct() {
       promotionStatus: promotionStatus,
     };
 
-    fetch(`http://localhost:8082/api/v1/updateproduct/${currentProductId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedFormData),
-    })
+    fetch(
+      `https://backfood.tfdatamaster.com/api/v1/updateproduct/${currentProductId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedFormData),
+      }
+    )
       .then((response) => response.json())
       .then((data) => {
         console.log(data);

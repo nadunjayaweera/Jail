@@ -93,7 +93,7 @@ export default function FormAddStock() {
 
   useEffect(() => {
     // Fetch data from the API when the component is mounted
-    fetch("http://localhost:8082/api/v1/getallrowitems")
+    fetch("https://backfood.tfdatamaster.com/api/v1/getallrowitems")
       .then((response) => response.json())
       .then((data) => {
         // Rename "_id" to "id" in each row
@@ -123,7 +123,7 @@ export default function FormAddStock() {
   const handleDelete = (_id) => {
     if (window.confirm("Are you sure you want to delete this item?")) {
       // Send a DELETE request to the API
-      fetch(`http://localhost:8082/api/v1/deleterowitem/${_id}`, {
+      fetch(`https://backfood.tfdatamaster.com/api/v1/deleterowitem/${_id}`, {
         method: "DELETE",
       })
         .then((response) => {
@@ -147,20 +147,23 @@ export default function FormAddStock() {
   const handleSaveChanges = () => {
     if (selectedItem) {
       // Make a PUT request to update the item
-      fetch(`http://localhost:8082/api/v1/updaterowitem/${selectedItem._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(selectedItem),
-      })
+      fetch(
+        `https://backfood.tfdatamaster.com/api/v1/updaterowitem/${selectedItem._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(selectedItem),
+        }
+      )
         .then((response) => response.json())
         .then((updatedItem) => {
           console.log("Item updated:", updatedItem);
           setOpenDialog(false); // Close the dialog after saving changes
 
           // After saving changes, refetch the data to update the form
-          fetch("http://localhost:8082/api/v1/getallrowitems")
+          fetch("https://backfood.tfdatamaster.com/api/v1/getallrowitems")
             .then((response) => response.json())
             .then((data) => {
               // Rename "_id" to "id" in each row

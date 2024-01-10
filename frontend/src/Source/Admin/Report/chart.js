@@ -121,7 +121,7 @@ const Topsell = () => {
     const formattedDate = value ? format(value, "MMMM d, yyyy") : null;
 
     // Update the API URL with the formatted date
-    const apiUrl = `http://localhost:8082/api/v1/data/sales?date=${encodeURIComponent(
+    const apiUrl = `https://backfood.tfdatamaster.com/api/v1/data/sales?date=${encodeURIComponent(
       formattedDate
     )}`;
 

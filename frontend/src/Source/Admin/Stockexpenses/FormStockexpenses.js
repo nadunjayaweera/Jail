@@ -63,7 +63,7 @@ export default function FormStockexpenses() {
       ? format(endDate, "yyyy-MM-dd", { timeZone: "Asia/Colombo" })
       : null;
 
-    const apiUrl = `http://localhost:8082/api/v1/stock?startDate=${formattedStartDate}&endDate=${formattedEndDate}`;
+    const apiUrl = `https://backfood.tfdatamaster.com/api/v1/stock?startDate=${formattedStartDate}&endDate=${formattedEndDate}`;
     console.log("URL end point", apiUrl);
     fetch(apiUrl)
       .then((response) => response.json())

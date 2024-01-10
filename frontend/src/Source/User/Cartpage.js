@@ -151,7 +151,7 @@ const CheckoutPage = () => {
   const pay = async (event) => {
     try {
       const addSaleResponse = await axios.post(
-        "http://localhost:8082/api/v1/addsale",
+        "https://backfood.tfdatamaster.com/api/v1/addsale",
         apiData
       );
 

@@ -55,7 +55,7 @@ export default function ProductList() {
     const fetchSalesData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8082/api/v1/getsales"
+          "https://backfood.tfdatamaster.com/api/v1/getsales"
         );
         const salesData = response.data;
         const currentDate = new Date().toISOString().split("T")[0];
@@ -204,12 +204,14 @@ export default function ProductList() {
     try {
       // Make an API request to update the order status
       await axios.put(
-        `http://localhost:8082/api/v1/${feeldid}/update-data`,
+        `https://backfood.tfdatamaster.com/api/v1/${feeldid}/update-data`,
         {}
       );
 
       // Fetch the updated sales data
-      const response = await axios.get("http://localhost:8082/api/v1/getsales");
+      const response = await axios.get(
+        "https://backfood.tfdatamaster.com/api/v1/getsales"
+      );
       const updatedSalesData = response.data.map((product, index) => ({
         id: index + 1,
         feeldid: product._id,

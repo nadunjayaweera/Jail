@@ -57,7 +57,7 @@ export default function ProductList() {
     const fetchSalesData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8082/api/v1/data/items"
+          "https://backfood.tfdatamaster.com/api/v1/data/items"
         );
         console.log("API Response:", response.data);
 
@@ -92,7 +92,7 @@ export default function ProductList() {
       "Are you sure you want to delete this row?"
     );
     if (confirmed) {
-      fetch(`http://localhost:8082/api/v1/deleteitem/${pid}`, {
+      fetch(`https://backfood.tfdatamaster.com/api/v1/deleteitem/${pid}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

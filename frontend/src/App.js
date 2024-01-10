@@ -20,7 +20,7 @@ import AddProducts from "./Source/Admin/Additem/ProductAdd/Addproduct";
 import Sales from "./Source/Admin/Sales/Sales";
 import EditItem from "./Source/Admin/Editproduct/Editproduct";
 import Orders from "./Source/Admin/Orders/formorders";
-import Pos from "./Source/Admin/POS/posarchi";
+import Pos from "./Source/Admin/POS/Posarchi";
 import Stripe from "./Source/User/stripe/StripeContainer";
 import Cartpage from "./Source/User/Cartpage";
 import Form from "./Source/User/payhere/Form";

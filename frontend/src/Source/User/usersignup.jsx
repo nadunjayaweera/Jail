@@ -38,7 +38,7 @@ export default function SignUpPage() {
       return;
     }
 
-    fetch("http://localhost:8082/api/v1/signup", {
+    fetch("https://backfood.tfdatamaster.com/api/v1/signup", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
