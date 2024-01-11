@@ -27,73 +27,87 @@ export default class PresonnerSignupDAO {
       const existingUser = await presoners.findOne({ mobileno: mobileno });
 
       if (existingUser) {
-        // Increment attempts count
-        const updatedAttempts = existingUser.attempt + 1;
+        // Check for lockout expiration first
+        if (
+          existingUser.lockoutTime &&
+          new Date() >= new Date(existingUser.lockoutTime)
+        ) {
+          // Reset attempts and lockout time if expired
+          await presoners.updateOne(
+            { _id: existingUser._id },
+            { $set: { attempt: 0, lockoutTime: null } }
+          );
+        } else {
+          // Proceed with incrementing attempts and potential lockout
 
-        // Check if attempts exceed 3
-        if (updatedAttempts > 2) {
-          // Implement lockout logic (e.g., set a lockout timestamp)
-          // For simplicity, let's set a lockout timestamp for 10 minutes
-          const lockoutTime = new Date();
-          lockoutTime.setMinutes(lockoutTime.getMinutes() + 1);
+          // Increment attempts count
+          const updatedAttempts = existingUser.attempt + 1;
 
-          // Update the existing user with lockout information
+          // Check if attempts exceed 3
+          if (updatedAttempts > 2) {
+            // Implement lockout logic
+            const lockoutTime = new Date();
+            lockoutTime.setMinutes(lockoutTime.getMinutes() + 10); // Set lockout for 10 minutes
+
+            await presoners.updateOne(
+              { _id: existingUser._id },
+              {
+                $set: {
+                  attempt: updatedAttempts,
+                  lockoutTime: lockoutTime,
+                },
+              }
+            );
+
+            return {
+              error:
+                "Account locked due to multiple unsuccessful attempts. Please try again later.",
+            };
+          }
+
+          // Generate a new random 5-digit password
+          const newPassword = Math.floor(
+            1000 + Math.random() * 9000
+          ).toString();
+
+          // Update the existing user with new password and reset lockout time
           await presoners.updateOne(
             { _id: existingUser._id },
             {
               $set: {
+                password: newPassword,
                 attempt: updatedAttempts,
-                lockoutTime: lockoutTime,
+                lockoutTime: null, // Reset lockout time even on successful password update
               },
             }
           );
 
           return {
-            error:
-              "Account locked due to multiple unsuccessful attempts. Please try again later.",
+            success: "Password updated successfully",
+            password: newPassword,
           };
         }
+      } else {
+        // Generate a random 5-digit password
+        const password = Math.floor(1000 + Math.random() * 9000).toString();
 
-        // Generate a new random 5-digit password
-        const newPassword = Math.floor(1000 + Math.random() * 9000).toString();
-
-        // Update the existing user with new password and incremented attempts count
-        await presoners.updateOne(
-          { _id: existingUser._id },
-          {
-            $set: {
-              password: newPassword,
-              attempt: updatedAttempts,
-              lockoutTime: null, // Reset lockout time
-            },
-          }
-        );
-
-        return {
-          success: "Password updated successfully",
-          password: newPassword,
+        const count = await presoners.countDocuments();
+        const userId = (count + 1).toString().padStart(3, "0");
+        const currentDate = new Date().toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        });
+        const addDoc = {
+          userId: userId,
+          mobileno: mobileno,
+          password: password,
+          attempt: attempts,
+          createDate: currentDate,
+          lockoutTime: null,
         };
+        return await presoners.insertOne(addDoc);
       }
-
-      // Generate a random 5-digit password
-      const password = Math.floor(1000 + Math.random() * 9000).toString();
-
-      const count = await presoners.countDocuments();
-      const userId = (count + 1).toString().padStart(3, "0");
-      const currentDate = new Date().toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      });
-      const addDoc = {
-        userId: userId,
-        mobileno: mobileno,
-        password: password,
-        attempt: attempts,
-        createDate: currentDate,
-        lockoutTime: null, // Initialize lockout time as null
-      };
-      return await presoners.insertOne(addDoc);
     } catch (e) {
       console.error(`Unable to add user: ${e}`);
       return { error: e };
