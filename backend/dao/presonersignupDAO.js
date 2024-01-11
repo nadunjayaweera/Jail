@@ -112,6 +112,7 @@ export default class PresonnerSignupDAO {
           Name: name,
           PresonerId: presonerid,
           WardNo: wardno,
+          role: "Presoner",
         };
         return await presoners.insertOne(addDoc);
       }

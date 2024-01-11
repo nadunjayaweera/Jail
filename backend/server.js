@@ -31,41 +31,41 @@ app.use(cors());
 app.use(express.json());
 
 app.post("/stripe/charge", async (req, res) => {
-    console.log("stripe-routes.js 9 | route reached", req.body);
-    const { amount, id, name, quantity, productId, price } = req.body;
-    console.log(
-        "stripe-routes.js 10 | amount, id, name, quantity, productId, price",
-        amount,
-        id,
-        name,
-        quantity,
-        productId,
-        price
-    );
-    try {
-        const payment = await stripeInstance.paymentIntents.create({
-            amount: amount * 100, // Convert amount to cents
-            currency: "USD",
-            description: "Your Company Description",
-            payment_method: id,
-            confirm: true,
-        });
-        console.log("stripe-routes.js 19 | payment", payment);
-        res.json({
-            message: "Payment Successful",
-            success: true,
-            paymentMethod: payment,
-        });
-    } catch (error) {
-        console.log("stripe-routes.js 17 | error", error);
-        res.json({
-            message: "Payment Failed",
-            success: false,
-        });
-    }
+  console.log("stripe-routes.js 9 | route reached", req.body);
+  const { amount, id, name, quantity, productId, price } = req.body;
+  console.log(
+    "stripe-routes.js 10 | amount, id, name, quantity, productId, price",
+    amount,
+    id,
+    name,
+    quantity,
+    productId,
+    price
+  );
+  try {
+    const payment = await stripeInstance.paymentIntents.create({
+      amount: amount * 100, // Convert amount to cents
+      currency: "USD",
+      description: "Your Company Description",
+      payment_method: id,
+      confirm: true,
+    });
+    console.log("stripe-routes.js 19 | payment", payment);
+    res.json({
+      message: "Payment Successful",
+      success: true,
+      paymentMethod: payment,
+    });
+  } catch (error) {
+    console.log("stripe-routes.js 17 | error", error);
+    res.json({
+      message: "Payment Failed",
+      success: false,
+    });
+  }
 });
 
-app.use("/api/v1/signup", signup);
+app.use("/api/v1/membersignup", signup);
 app.use("/api/v1/presonersignup", presonersignup);
 app.use("/api/v1/login", login); // add the login route
 app.use("/api/v1/users", getUsers); // add the users route

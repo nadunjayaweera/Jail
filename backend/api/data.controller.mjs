@@ -65,7 +65,12 @@ export default class DataController {
     try {
       const pageNumber = parseInt(req.query.pageNumber) || 1;
       const itemsPerPage = parseInt(req.query.itemsPerPage) || 10; // Set a default value or change it as needed
-      const data = await DataDAO.getItempart(pageNumber, itemsPerPage);
+      const category = req.query.category;
+      const data = await DataDAO.getItempart(
+        pageNumber,
+        itemsPerPage,
+        category
+      );
       res.json(data);
     } catch (err) {
       console.error(`Error getting data: ${err}`);

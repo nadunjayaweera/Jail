@@ -2,7 +2,7 @@ import mongodb from "mongodb";
 import dotenv from "dotenv";
 dotenv.config();
 const ObjectId = mongodb.ObjectID;
-
+let currentItemID = 0; // Intialize the conter
 let items;
 
 export default class ItemDAO {
@@ -16,19 +16,33 @@ export default class ItemDAO {
       console.error(`Unable to establish collection handles in ItemDAO: ${e}`);
     }
   }
+
   static async addItem(item) {
     if (!items) {
       throw new Error("DataDAO not initialized");
     }
     try {
-      const result = await items.insertOne(item);
+      // Find the item with the maximum itemid
+      const maxItem = await items.findOne({}, { sort: { itemid: -1 } });
+
+      // Determine the next itemid
+      const nextItemId = maxItem ? maxItem.itemid + 1 : 1;
+
+      // Add the itemid field to the item object
+      const newItem = {
+        ...item,
+        itemid: nextItemId,
+      };
+
+      const result = await items.insertOne(newItem);
       const insertedItem = result.ops[0];
       return insertedItem;
     } catch (err) {
-      console.error(`Error adding sale: ${err}`);
+      console.error(`Error adding item: ${err}`);
       throw err;
     }
   }
+
   static async deleteItem(id) {
     if (!items) {
       throw new Error("ItemDAO not initialized");
