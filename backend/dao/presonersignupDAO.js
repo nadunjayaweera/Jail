@@ -4,16 +4,20 @@ dotenv.config();
 const ObjectId = mongodb.ObjectID;
 
 let presoners;
+let loggedinPrisoners;
 
 export default class PresonnerSignupDAO {
   static async injectDB(conn) {
-    if (presoners) {
+    if (presoners && loggedinPrisoners) {
       return;
     }
     try {
       presoners = await conn
         .db(process.env.DATA_BASE_NAME)
         .collection("presoners");
+      loggedinPrisoners = await conn
+        .db(process.env.Data_BASE_NAME)
+        .collection("loggedinprisoners");
     } catch (e) {
       console.error(
         `Unable to establish collection handles in PresonnerSignupDAO: ${e}`
@@ -21,7 +25,7 @@ export default class PresonnerSignupDAO {
     }
   }
 
-  static async addUser(mobileno, attempts) {
+  static async addUser(mobileno, attempts, name, presonerid, wardno) {
     try {
       // Check if the user already exists
       const existingUser = await presoners.findOne({ mobileno: mobileno });
@@ -105,11 +109,30 @@ export default class PresonnerSignupDAO {
           attempt: attempts,
           createDate: currentDate,
           lockoutTime: null,
+          Name: name,
+          PresonerId: presonerid,
+          WardNo: wardno,
         };
         return await presoners.insertOne(addDoc);
       }
     } catch (e) {
       console.error(`Unable to add user: ${e}`);
+      return { error: e };
+    }
+  }
+
+  static async moveUserToLoggedinCollection(userId) {
+    try {
+      const user = await presoners.findOne({ _id: ObjectId(userId) });
+      if (user) {
+        await loggedinPrisoners.insertOne(user);
+        await presoners.deleteOne({ _id: ObjectId(userId) });
+        return { success: "User moved to loggedinprisoners collection" };
+      } else {
+        return { error: "User not found in presoners collection" };
+      }
+    } catch (e) {
+      console.error(`Unable to move user to loggedinprisoners: ${e}`);
       return { error: e };
     }
   }

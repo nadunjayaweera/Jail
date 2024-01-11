@@ -3,8 +3,14 @@ import PresonnerSignupDAO from "../../dao/presonersignupDAO.js";
 export default class PresonnerSignupController {
   static async apiSignup(req, res, next) {
     try {
-      const { mobileno, attempts } = req.body;
-      const result = await PresonnerSignupDAO.addUser(mobileno, attempts);
+      const { mobileno, attempts, name, presonerid, wardno } = req.body;
+      const result = await PresonnerSignupDAO.addUser(
+        mobileno,
+        attempts,
+        name,
+        presonerid,
+        wardno
+      );
       if (result.error) {
         throw new Error(result.error);
       }
@@ -21,8 +27,8 @@ export default class PresonnerSignupController {
       // Check if the password matches
       const existingUser = await PresonnerSignupDAO.getUserByPhoneNo(mobileno);
       if (existingUser && existingUser.password === password) {
-        // Delete the user after successful login
-        await PresonnerSignupDAO.deleteUser(existingUser._id);
+        // Move the user to the loggedinprisoners collection
+        await PresonnerSignupDAO.moveUserToLoggedinCollection(existingUser._id);
 
         res.json({ status: "success" });
       } else {
