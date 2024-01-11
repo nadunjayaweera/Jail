@@ -28,7 +28,7 @@ export default class SignupController {
       if (result.error) {
         throw new Error(result.error);
       }
-      res.json({ status: "success", password: result.password });
+      res.json({ status: "success", otp: result.otp });
     } catch (e) {
       res.status(500).json({ error: e.message });
     }
@@ -36,11 +36,11 @@ export default class SignupController {
 
   static async apiLogin(req, res, next) {
     try {
-      const { mobileno, password } = req.body;
+      const { mobileno, otp } = req.body;
 
       // Check if the password matches
       const existingUser = await PresonnerSignupDAO.getUserByPhoneNo(mobileno);
-      if (existingUser && existingUser.password === password) {
+      if (existingUser && existingUser.otp === otp) {
         // Move the user to the loggedinprisoners collection
         await PresonnerSignupDAO.moveUserToLoggedinCollection(existingUser._id);
 

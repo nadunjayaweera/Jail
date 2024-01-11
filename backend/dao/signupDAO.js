@@ -79,16 +79,14 @@ export default class SignupDAO {
           }
 
           // Generate a new random 5-digit password
-          const newPassword = Math.floor(
-            1000 + Math.random() * 9000
-          ).toString();
+          const newOtp = Math.floor(1000 + Math.random() * 9000).toString();
 
           // Update the existing user with new password and reset lockout time
           await users.updateOne(
             { _id: existingUser._id },
             {
               $set: {
-                password: newPassword,
+                otp: newOtp,
                 attempt: updatedAttempts,
                 lockoutTime: null, // Reset lockout time even on successful password update
               },
@@ -96,13 +94,13 @@ export default class SignupDAO {
           );
 
           return {
-            success: "Password updated successfully",
-            password: newPassword,
+            success: "OUT updated successfully",
+            otp: newOtp,
           };
         }
       } else {
         // Generate a random 5-digit password
-        const password = Math.floor(1000 + Math.random() * 9000).toString();
+        const otp = Math.floor(1000 + Math.random() * 9000).toString();
 
         const count = await users.countDocuments();
         const userId = (count + 1).toString().padStart(3, "0");
