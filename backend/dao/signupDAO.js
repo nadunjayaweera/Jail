@@ -31,7 +31,6 @@ export default class SignupDAO {
     password,
     role,
     section,
-    verryfied,
     otp,
     attempts
   ) {
@@ -118,7 +117,6 @@ export default class SignupDAO {
           password: password,
           role: "users",
           section: section,
-          verryfied: verryfied,
           otp: otp,
           attempt: attempts,
           createDate: currentDate,
@@ -132,7 +130,7 @@ export default class SignupDAO {
     }
   }
 
-  static async moveUserToLoggedinCollection(userId) {
+  static async moveUserToUserLoggedinCollection(userId) {
     try {
       const user = await users.findOne({ _id: ObjectId(userId) });
       if (user) {

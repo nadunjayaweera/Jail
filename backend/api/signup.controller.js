@@ -11,7 +11,6 @@ export default class SignupController {
         password,
         role,
         section,
-        verryfied,
         otp,
       } = req.body;
       const result = await SignupDAO.addUser(
@@ -22,7 +21,6 @@ export default class SignupController {
         password,
         role,
         section,
-        verryfied,
         otp
       );
       if (result.error) {
@@ -39,10 +37,10 @@ export default class SignupController {
       const { mobileno, otp } = req.body;
 
       // Check if the password matches
-      const existingUser = await PresonnerSignupDAO.getUserByPhoneNo(mobileno);
+      const existingUser = await SignupDAO.getUserByPhoneNo(mobileno);
       if (existingUser && existingUser.otp === otp) {
         // Move the user to the loggedinprisoners collection
-        await PresonnerSignupDAO.moveUserToLoggedinCollection(existingUser._id);
+        await SignupDAO.moveUserToUserLoggedinCollection(existingUser._id);
 
         res.json({ status: "success" });
       } else {
