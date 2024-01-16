@@ -120,9 +120,9 @@ export default class DataController {
   }
 
   static async getUserOrders(req, res, next) {
-    const email = req.params.email; // Assuming the email is passed as a route parameter
+    const employeeid = req.params.employeeid; // Assuming the email is passed as a route parameter
     try {
-      const orders = await DataDAO.getUserOrders(email);
+      const orders = await DataDAO.getUserOrders(employeeid);
 
       // Filter orders where the orderStatus is not equal to 'Delivered'
       const filteredOrders = orders.filter(
@@ -161,14 +161,21 @@ export default class DataController {
 
   static async addSale(req, res, next) {
     try {
-      const { customerName, products, totalPrice, productStatus, email } =
-        req.body;
-      const result = await DataDAO.addSale(
+      const {
         customerName,
+        customerdetails,
         products,
         totalPrice,
-        productStatus,
-        email
+        mobileno,
+        role,
+      } = req.body;
+      const result = await DataDAO.addSale(
+        customerName,
+        customerdetails,
+        products,
+        totalPrice,
+        mobileno,
+        role
       );
       if (result) {
         res.json({ success: true, message: "Sale added successfully" });

@@ -5,6 +5,7 @@ const ObjectId = mongodb.ObjectID;
 
 let item;
 let sale;
+let orders;
 let menus;
 let rowitems;
 let stocks;
@@ -14,12 +15,13 @@ let cumulativeQuantities = {};
 
 export default class DataDAO {
   static async injectDB(conn) {
-    if (item && sale && menus && rowitems && stocks) {
+    if (item && sale && orders && menus && rowitems && stocks) {
       return;
     }
     try {
       item = await conn.db(process.env.DATA_BASE_NAME).collection("item");
       sale = await conn.db(process.env.DATA_BASE_NAME).collection("sales");
+      orders = await conn.db(process.env.DATA_BASE_NAME).collection("orders");
       menus = await conn.db(process.env.DATA_BASE_NAME).collection("menus");
       rowitems = await conn
         .db(process.env.DATA_BASE_NAME)
@@ -34,41 +36,57 @@ export default class DataDAO {
 
   static async addSale(
     customerName,
+    customerdetails,
     products,
     totalPrice,
-    productStatus,
-    email
+    mobileno,
+    role
   ) {
-    if (!sale || !menus || !rowitems || !stocks) {
+    if (!sale || !orders || !menus || !rowitems || !stocks) {
       throw new Error("DataDAO not initialized");
     }
     try {
-      const lastSale = await sale.findOne({}, { sort: { orderId: -1 } });
-      const lastOrderId = lastSale ? parseInt(lastSale.orderId, 10) : 0;
+      // Get the current Unix timestamp
+      const unixTimestamp = Math.floor(new Date().getTime() / 1000);
 
-      let newOrderId = lastOrderId + 1;
-      if (newOrderId >= 10000) {
-        newOrderId = (newOrderId % 10000) + 1;
-      }
-      const formattedOrderId = newOrderId.toString().padStart(4, "0");
+      // Use the Unix timestamp as orderId
+      const formattedOrderId = unixTimestamp.toString();
 
       const timestamp = new Date().toLocaleDateString("en-US", {
         month: "long",
         day: "numeric",
         year: "numeric",
+        hour12: false,
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
       });
 
       const sales = {
         orderId: formattedOrderId,
         customerName,
+        customerdetails,
         products,
         totalPrice,
-        productStatus,
         timestamp,
-        email,
+        mobileno,
+        role,
       };
 
       const result = await sale.insertOne(sales);
+
+      // Extract relevant data for the orders collection
+      for (const product of products) {
+        const ordersData = {
+          customerName,
+          customerdetails,
+          products: [product], // Only the current product
+          mobileno,
+          role,
+        };
+        // Insert data into the orders collection
+        await orders.insertOne(ordersData);
+      }
 
       // Fetch and log menu details for each product in the order
       for (const product of products) {

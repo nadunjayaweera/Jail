@@ -31,6 +31,7 @@ export default class SignupDAO {
     password,
     role,
     section,
+    designation,
     otp,
     attempts
   ) {
@@ -116,6 +117,7 @@ export default class SignupDAO {
           employeeid: employeeid,
           password: password,
           role: "users",
+          designation: designation,
           section: section,
           otp: otp,
           attempt: attempts,

@@ -11,6 +11,7 @@ export default class SignupController {
         password,
         role,
         section,
+        designation,
         otp,
       } = req.body;
       const result = await SignupDAO.addUser(
@@ -21,6 +22,7 @@ export default class SignupController {
         password,
         role,
         section,
+        designation,
         otp
       );
       if (result.error) {
