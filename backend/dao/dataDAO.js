@@ -62,6 +62,30 @@ export default class DataDAO {
         second: "2-digit",
       });
 
+      const groupedOrders = {};
+
+      // Group products based on the same date and meal category
+      for (const product of products) {
+        const key = `${product.date}_${product.meal}`;
+        if (!groupedOrders[key]) {
+          groupedOrders[key] = {
+            customerName,
+            customerdetails,
+            products: [product],
+            mobileno,
+            role,
+            orderId: formattedOrderId,
+          };
+        } else {
+          groupedOrders[key].products.push(product);
+        }
+      }
+
+      // Insert data into the orders collection for each group
+      for (const key in groupedOrders) {
+        await orders.insertOne(groupedOrders[key]);
+      }
+
       const sales = {
         orderId: formattedOrderId,
         customerName,
@@ -74,19 +98,6 @@ export default class DataDAO {
       };
 
       const result = await sale.insertOne(sales);
-
-      // Extract relevant data for the orders collection
-      for (const product of products) {
-        const ordersData = {
-          customerName,
-          customerdetails,
-          products: [product], // Only the current product
-          mobileno,
-          role,
-        };
-        // Insert data into the orders collection
-        await orders.insertOne(ordersData);
-      }
 
       // Fetch and log menu details for each product in the order
       for (const product of products) {
