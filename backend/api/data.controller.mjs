@@ -78,16 +78,58 @@ export default class DataController {
     }
   }
 
-  static async updateData(req, res, next) {
-    const itemId = req.params.itemId; // Assuming the itemId is passed as a route parameter
+  // static async updateData(req, res, next) {
+  //   const itemId = req.params.itemId; // Assuming the itemId is passed as a route parameter
+
+  //   try {
+  //     const currentStatus = await DataDAO.getProductStatus(itemId);
+  //     console.log("Current Status:", currentStatus);
+
+  //     let newStatus;
+
+  //     if (currentStatus === "pending") {
+  //       newStatus = "Processing";
+  //     } else if (currentStatus === "Processing") {
+  //       newStatus = "Done";
+  //     } else if (currentStatus === "Done") {
+  //       newStatus = "Delivered";
+  //     } else {
+  //       res.status(400).json({
+  //         success: false,
+  //         message: "Invalid current product status",
+  //       });
+  //       return;
+  //     }
+
+  //     const updateSuccessful = await DataDAO.updateItem(itemId, newStatus);
+  //     if (updateSuccessful) {
+  //       res.json({
+  //         success: true,
+  //         message: "Product status updated successfully",
+  //       });
+  //     } else {
+  //       res.status(500).json({
+  //         success: false,
+  //         message: "Failed to update product status",
+  //       });
+  //     }
+  //   } catch (err) {
+  //     console.error(`Error updating product status: ${err}`);
+  //     res.status(500).json({ success: false, error: err });
+  //   }
+  // }
+
+  static async updateOrderStatus(req, res, next) {
+    const orderId = req.params.orderId; // Assuming the orderId is passed as a route parameter
+    console.log("OrderId:", orderId);
 
     try {
-      const currentStatus = await DataDAO.getProductStatus(itemId);
-      console.log("Current Status:", currentStatus);
+      const currentStatus = await DataDAO.getOrderStatus(orderId);
+      console.log("Current Order Status:", currentStatus);
 
       let newStatus;
 
-      if (currentStatus === "pending") {
+      if (currentStatus === "Pending") {
         newStatus = "Processing";
       } else if (currentStatus === "Processing") {
         newStatus = "Done";
@@ -96,25 +138,28 @@ export default class DataController {
       } else {
         res.status(400).json({
           success: false,
-          message: "Invalid current product status",
+          message: "Invalid current order status",
         });
         return;
       }
 
-      const updateSuccessful = await DataDAO.updateItem(itemId, newStatus);
+      const updateSuccessful = await DataDAO.updateOrderStatus(
+        orderId,
+        newStatus
+      );
       if (updateSuccessful) {
         res.json({
           success: true,
-          message: "Product status updated successfully",
+          message: "Order status updated successfully",
         });
       } else {
         res.status(500).json({
           success: false,
-          message: "Failed to update product status",
+          message: "Failed to update order status",
         });
       }
     } catch (err) {
-      console.error(`Error updating product status: ${err}`);
+      console.error(`Error updating order status: ${err}`);
       res.status(500).json({ success: false, error: err });
     }
   }

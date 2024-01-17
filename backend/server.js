@@ -19,7 +19,7 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import addSale from "./api/data.route.mjs";
 import getSale from "./api/data.route.mjs";
-import updateData from "./api/data.route.mjs";
+import updateOrderStatus from "./api/data.route.mjs";
 dotenv.config();
 const stripeSecretTest = process.env.STRIPE_SECRET_TEST;
 const stripeInstance = stripe(stripeSecretTest);
@@ -77,7 +77,7 @@ app.use("/api/v1/data", dataRoute); // add the data route
 app.use("/api/v1/data", getData); // add the data route
 app.use("/api/v1/data", getItem); // add the data route
 app.use("/api/v1/", updateItemQuantity); // add the data route
-app.use("/api/v1/", updateData); // add the data route
+app.use("/api/v1/", updateOrderStatus); // add the data route
 app.use("/api/v1/", addSale); // add the data route
 app.use("/api/v1/", getSale); // add the data route
 app.use("/api/v1/", updateitem); // add the data route

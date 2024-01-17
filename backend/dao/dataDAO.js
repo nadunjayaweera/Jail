@@ -74,6 +74,7 @@ export default class DataDAO {
             products: [product],
             mobileno,
             role,
+            orderstatus: "Pending",
             orderId: formattedOrderId,
           };
         } else {
@@ -239,6 +240,30 @@ export default class DataDAO {
       return result.insertedId;
     } catch (err) {
       console.error(`Error adding sale: ${err}`);
+      throw err;
+    }
+  }
+
+  static async getOrderStatus(orderId) {
+    try {
+      const order = await orders.findOne({ _id: ObjectId(orderId) });
+      return order ? order.orderstatus : null;
+    } catch (err) {
+      console.error(`Error getting order status: ${err}`);
+      throw err;
+    }
+  }
+
+  static async updateOrderStatus(orderId, newStatus) {
+    try {
+      const result = await orders.updateOne(
+        { _id: ObjectId(orderId) },
+        { $set: { orderstatus: newStatus } }
+      );
+
+      return result.modifiedCount > 0;
+    } catch (err) {
+      console.error(`Error updating order status: ${err}`);
       throw err;
     }
   }
