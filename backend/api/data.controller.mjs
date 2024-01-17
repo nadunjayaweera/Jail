@@ -78,47 +78,6 @@ export default class DataController {
     }
   }
 
-  // static async updateData(req, res, next) {
-  //   const itemId = req.params.itemId; // Assuming the itemId is passed as a route parameter
-
-  //   try {
-  //     const currentStatus = await DataDAO.getProductStatus(itemId);
-  //     console.log("Current Status:", currentStatus);
-
-  //     let newStatus;
-
-  //     if (currentStatus === "pending") {
-  //       newStatus = "Processing";
-  //     } else if (currentStatus === "Processing") {
-  //       newStatus = "Done";
-  //     } else if (currentStatus === "Done") {
-  //       newStatus = "Delivered";
-  //     } else {
-  //       res.status(400).json({
-  //         success: false,
-  //         message: "Invalid current product status",
-  //       });
-  //       return;
-  //     }
-
-  //     const updateSuccessful = await DataDAO.updateItem(itemId, newStatus);
-  //     if (updateSuccessful) {
-  //       res.json({
-  //         success: true,
-  //         message: "Product status updated successfully",
-  //       });
-  //     } else {
-  //       res.status(500).json({
-  //         success: false,
-  //         message: "Failed to update product status",
-  //       });
-  //     }
-  //   } catch (err) {
-  //     console.error(`Error updating product status: ${err}`);
-  //     res.status(500).json({ success: false, error: err });
-  //   }
-  // }
-
   static async updateOrderStatus(req, res, next) {
     const orderId = req.params.orderId; // Assuming the orderId is passed as a route parameter
     console.log("OrderId:", orderId);
@@ -242,7 +201,18 @@ export default class DataController {
       res.status(500).json({ error: err });
     }
   }
-  // data.controller.mjs
+
+  static async getdailyorders(req, res, next) {
+    const meal = req.query.meal;
+    try {
+      const orders = await DataDAO.getdailyorders(meal);
+      res.json(orders);
+    } catch (err) {
+      console.error(`Error getting data: ${err}`);
+      res.status(500).json({ error: err });
+    }
+  }
+
   static async getSalesByDate(req, res, next) {
     const date = req.query.date; // Assuming the date is passed as a query parameter
 

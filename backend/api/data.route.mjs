@@ -7,9 +7,10 @@ router.get("/", DataController.getData);
 router.get("/items", DataController.getItem);
 router.get("/itemname", DataController.getItemName);
 // router.post("/", DataController.addData);
-router.put("/:orderId/update-data", DataController.updateOrderStatus); // Add this line for updating orderStatus
+router.put("/:orderId/update-data", DataController.updateOrderStatus);
 router.post("/addsale", DataController.addSale);
 router.get("/getsales", DataController.getSale);
+router.get("/getorders", DataController.getdailyorders);
 router.put("/updatedata", DataController.updateOrderStatus);
 router.get("/getuserorders/:email", DataController.getUserOrders);
 router.get("/sales", DataController.getSalesByDate);

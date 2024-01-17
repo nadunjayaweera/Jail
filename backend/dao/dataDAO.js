@@ -322,51 +322,6 @@ export default class DataDAO {
     }
   }
 
-  static async updateItem(itemId, productStatus) {
-    if (!sale) {
-      throw new Error("DataDAO not initialized");
-    }
-    try {
-      const itemToUpdate = await sale.findOne({ _id: ObjectId(itemId) });
-
-      if (!itemToUpdate) {
-        throw new Error("Item not found");
-      }
-
-      await sale.updateOne(
-        { _id: ObjectId(itemId) },
-        { $set: { productStatus } }
-      );
-
-      return true; // Return a success flag if the update is successful
-    } catch (err) {
-      console.error(`Error updating product status: ${err}`);
-      return false; // Return a failure flag if an error occurs during the update
-    }
-  }
-
-  static async getProductStatus(itemId) {
-    if (!sale) {
-      throw new Error("DataDAO not initialized");
-    }
-
-    try {
-      const item = await sale.findOne(
-        { _id: ObjectId(itemId) },
-        { projection: { productStatus: 1 } }
-      );
-
-      if (!item) {
-        throw new Error("Item not found");
-      }
-
-      return item.productStatus;
-    } catch (err) {
-      console.error(`Error getting product status: ${err}`);
-      throw err;
-    }
-  }
-
   static async getSale() {
     if (!sale) {
       throw new Error("DataDAO not initialized");
@@ -374,6 +329,45 @@ export default class DataDAO {
     try {
       const cursor = await sale.find({}).toArray();
       return cursor;
+    } catch (err) {
+      console.error(`Error getting data: ${err}`);
+      return { error: err };
+    }
+  }
+
+  static async getdailyorders() {
+    if (!orders) {
+      throw new Error("DataDAO not initialized");
+    }
+    try {
+      // Filter orders for today
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
+      const formattedDate = `${year}/${month}/${day}`;
+      console.log("Today:", formattedDate);
+      const dayOrders = await orders
+        .find({ "products.date": formattedDate })
+        .toArray();
+
+      // Transform and filter the response
+      const filteredOrders = dayOrders.map((order) => {
+        return {
+          _id: order._id,
+          customerName: order.customerName,
+          customerdetails: order.customerdetails,
+          products: order.products.map((product) => ({
+            productName: product.productName,
+            meal: product.meal,
+          })),
+          mobileno: order.mobileno,
+          orderstatus: order.orderstatus,
+          orderId: order.orderId,
+        };
+      });
+
+      return filteredOrders;
     } catch (err) {
       console.error(`Error getting data: ${err}`);
       return { error: err };
