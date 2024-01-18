@@ -335,7 +335,7 @@ export default class DataDAO {
     }
   }
 
-  static async getdailyorders() {
+  static async getdailyorders(meal) {
     if (!orders) {
       throw new Error("DataDAO not initialized");
     }
@@ -347,9 +347,14 @@ export default class DataDAO {
       const day = String(today.getDate()).padStart(2, "0");
       const formattedDate = `${year}/${month}/${day}`;
       console.log("Today:", formattedDate);
-      const dayOrders = await orders
-        .find({ "products.date": formattedDate })
-        .toArray();
+
+      // Construct the filter based on the date and meal
+      const filter = {
+        "products.date": formattedDate,
+        "products.meal": meal,
+      };
+
+      const dayOrders = await orders.find(filter).toArray();
 
       // Transform and filter the response
       const filteredOrders = dayOrders.map((order) => {
