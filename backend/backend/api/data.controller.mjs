@@ -238,15 +238,14 @@ export default class DataController {
     }
   }
 
-  // In data.controller.mjs
-  static async getTopSellingItems(req, res, next) {
-    const date = req.query.date;
+  static async getSalesByDate(req, res, next) {
+    const date = req.query.date; // Assuming the date is passed as a query parameter
 
     try {
-      const topSellingItems = await DataDAO.getTopSellingItems(date);
-      res.json(topSellingItems);
+      const sales = await DataDAO.getSalesByDate(date);
+      res.json(sales);
     } catch (err) {
-      console.error(`Error getting top-selling items: ${err}`);
+      console.error(`Error getting sales by date: ${err}`);
       res.status(500).json({ error: err });
     }
   }
