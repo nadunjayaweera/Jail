@@ -15,7 +15,7 @@ import Paper from "@mui/material/Paper";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { mainListItems } from "./listitems";
-import { Chart, MonthlySales, Topsell } from "./Report/chart";
+import { Chart, MonthlySales, Topsell, Table } from "./Report/chart";
 // import Orders from '../Sales/Orders';
 import { AppBar, Drawer, mdTheme } from "./Structure";
 import Footer from "../footer";
@@ -41,7 +41,7 @@ export default function DashboardContent() {
 
   useEffect(() => {
     // Fetch humidity and temperature data from API
-    fetch("https://backfood.tfdatamaster.com/api/v1/data")
+    fetch("http://localhost:8084/api/v1/data")
       .then((response) => response.json())
       .then((data) => {})
       .catch((error) => {
@@ -56,7 +56,7 @@ export default function DashboardContent() {
         <AppBar position="absolute" open={open}>
           <Toolbar
             sx={{
-              pr: "24px", // keep right padding when drawer closed
+              pr: "24px",
             }}
           >
             <IconButton
@@ -80,7 +80,6 @@ export default function DashboardContent() {
             >
               Dashboard
             </Typography>
-            {/* <Notificationicon /> */}
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open}>
@@ -154,6 +153,14 @@ export default function DashboardContent() {
                     <Topsell />
                   </div>
                   {/* <Orders/> */}
+                </Paper>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
+                  <div>
+                    <Table />
+                  </div>
                 </Paper>
               </Grid>
             </Grid>

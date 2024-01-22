@@ -30,7 +30,7 @@ export default class PresonnerSignupController {
         // Move the user to the loggedinprisoners collection
         await PresonnerSignupDAO.moveUserToLoggedinCollection(existingUser._id);
 
-        res.json({ status: "success" });
+        res.json({ status: "success", userdata: existingUser });
       } else {
         throw new Error("Invalid credentials");
       }

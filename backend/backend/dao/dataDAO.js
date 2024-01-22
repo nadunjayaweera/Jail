@@ -408,44 +408,44 @@ export default class DataDAO {
     }
   }
 
-  static async getSalesByDate(date) {
-    if (!sale) {
+  static async getTopSellingItems(date, mealType) {
+    if (!orders) {
       throw new Error("DataDAO not initialized");
     }
-    console.log("Query Date:", date);
+
     try {
       const pipeline = [
-        {
-          $match: {
-            timestamp: {
-              $gte: new Date(date),
-              $lt: new Date(
-                new Date(date).setDate(new Date(date).getDate() + 1)
-              ),
-            },
-          },
-        },
-        {
-          $unwind: "$products", // Unwind the products array
-        },
         {
           $match: {
             "products.date": date,
           },
         },
         {
-          $group: {
-            _id: "$products.productName", // Group by product name
-            totalQuantity: { $sum: 1 }, // Count occurrences of each product
-          },
+          $unwind: "$products",
         },
       ];
 
-      const result = await sale.aggregate(pipeline).toArray();
-      console.log("Result:", result);
+      // Conditionally add a match stage for meal type if provided
+      if (mealType) {
+        pipeline.push({
+          $match: {
+            "products.meal": mealType,
+          },
+        });
+      }
+
+      pipeline.push({
+        $group: {
+          _id: "$products.productName",
+          count: { $sum: 1 },
+        },
+      });
+
+      const result = await orders.aggregate(pipeline).toArray();
+      console.log("Result", result);
       return result;
     } catch (err) {
-      console.error(`Error getting sales by date: ${err}`);
+      console.error(`Error getting top selling items: ${err}`);
       throw err;
     }
   }

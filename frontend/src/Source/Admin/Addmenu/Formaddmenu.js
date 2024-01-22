@@ -45,7 +45,7 @@ export default function FormAddMenu() {
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
   useEffect(() => {
-    fetch("https://backfood.tfdatamaster.com/api/v1/itemname")
+    fetch("http://localhost:8084/api/v1/itemname")
       .then((response) => response.json())
       .then((data) => {
         const mappedData = data.map((item) => ({
@@ -62,7 +62,7 @@ export default function FormAddMenu() {
   }, []);
 
   const handleGetRowItem = () => {
-    fetch("https://backfood.tfdatamaster.com/api/v1/getallrowitems")
+    fetch("http://localhost:8084/api/v1/getallrowitems")
       .then((response) => response.json())
       .then((data) => {
         const mappedRowData = data.map((item) => ({
@@ -125,7 +125,7 @@ export default function FormAddMenu() {
       items: selectedItems, // Include all selected items
     };
 
-    fetch("https://backfood.tfdatamaster.com/api/v1/addmenu", {
+    fetch("http://localhost:8084/api/v1/addmenu", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

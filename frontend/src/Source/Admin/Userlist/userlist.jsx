@@ -62,7 +62,7 @@ export default function Users() {
   ];
 
   React.useEffect(() => {
-    fetch("https://backfood.tfdatamaster.com/api/v1/users")
+    fetch("http://localhost:8084/api/v1/users")
       .then((response) => response.json())
       .then((data) => {
         const rows = data.map((row) => ({ ...row, id: row.userId }));

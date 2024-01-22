@@ -23,9 +23,7 @@ const Footer = () => {
   };
   const fetchSalesData = async () => {
     try {
-      const response = await axios.get(
-        "https://backfood.tfdatamaster.com/api/v1/getsales"
-      );
+      const response = await axios.get("http://localhost:8084/api/v1/getsales");
       const salesData = response.data;
       const lastElement = salesData[salesData.length - 1].orderId;
 
@@ -79,7 +77,7 @@ const Footer = () => {
         right: 0,
       }}
     >
-      <div class="popupbox" id="popup">
+      {/* <div class="popupbox" id="popup">
         <div class="popup">
           <img
             id="close2"
@@ -110,7 +108,7 @@ const Footer = () => {
             </button>{" "}
           </div>
         </div>
-      </div>
+      </div> */}
       <Stack
         direction={{ xs: "column", sm: "row" }}
         spacing={2}

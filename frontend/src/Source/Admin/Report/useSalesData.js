@@ -5,7 +5,7 @@ const useSalesData = (dataType, numberOfDays) => {
 
   useEffect(() => {
     // Fetch sales data from backend API
-    fetch("https://backfood.tfdatamaster.com/api/v1/getsales")
+    fetch("http://localhost:8084/api/v1/getsales")
       .then((response) => response.json())
       .then((salesData) => {
         // Process the sales data based on the dataType parameter
@@ -26,7 +26,7 @@ const useSalesData = (dataType, numberOfDays) => {
       const month = date.getMonth() + 1; // Months are zero-indexed, so add 1
       const year = date.getFullYear();
       const key = `${year}-${month}`;
-
+      console.log("Monthly date:", key);
       if (result[key]) {
         result[key].amount += parseInt(item.totalPrice);
       } else {

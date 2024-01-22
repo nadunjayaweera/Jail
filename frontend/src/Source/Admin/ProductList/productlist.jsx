@@ -41,7 +41,7 @@ const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
       },
     },
   },
-  "& .promotionStatusCell": {
+  "& .categoryCell": {
     display: "flex",
     alignItems: "center",
   },
@@ -57,7 +57,7 @@ export default function ProductList() {
     const fetchSalesData = async () => {
       try {
         const response = await axios.get(
-          "https://backfood.tfdatamaster.com/api/v1/data/items"
+          "https://backprison.talentfort.live/api/v1/data/items"
         );
         console.log("API Response:", response.data);
 
@@ -67,7 +67,7 @@ export default function ProductList() {
           name: sale.name,
           price: sale.price,
           description: sale.description,
-          promotionStatus: sale.promotionStatus,
+          category: sale.category,
           image: sale.image,
         }));
 
@@ -87,55 +87,28 @@ export default function ProductList() {
     });
   };
 
-  const handleDelete = (pid) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this row?"
-    );
-    if (confirmed) {
-      fetch(`https://backfood.tfdatamaster.com/api/v1/deleteitem/${pid}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data);
-          // Handle success response, if needed
-          // Refresh the list of items or update UI accordingly
-          window.location.reload();
-        })
-        .catch((error) => {
-          console.error(error);
-          // Handle error, if needed
-        });
+  const handleDelete = async (pid) => {
+    try {
+      const confirmed = window.confirm("Are you sure you want to delete this row?");
+      if (confirmed) {
+        await axios.delete(`https://backprison.talentfort.live/api/v1/deleteitem/${pid}`);
+        // Handle success response, if needed
+        // Refresh the list of items or update UI accordingly
+        const updatedSalesData = salesData.filter((sale) => sale.pid !== pid);
+        setSalesData(updatedSalesData);
+      }
+    } catch (error) {
+      console.error(error);
+      // Handle error, if needed
     }
   };
 
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
     { field: "name", headerName: "Product Name", width: 200 },
-    {
-      field: "price",
-      headerName: "Price (Rs.)",
-      type: "number",
-      width: 120,
-    },
+    { field: "price", headerName: "Price (Rs.)", type: "number", width: 120 },
     { field: "description", headerName: "Description", width: 300 },
-    {
-      field: "promotionStatus",
-      headerName: "Promotion Status",
-      width: 150,
-      renderCell: (params) => (
-        <div className="promotionStatusCell">
-          {params.row.promotionStatus === "promoted" ? (
-            <span style={{ color: "green" }}>Promoted</span>
-          ) : (
-            <span style={{ color: "red" }}>Not Promoted</span>
-          )}
-        </div>
-      ),
-    },
+    { field: "category", headerName: "Category", width: 150 },
     {
       field: "image",
       headerName: "Image",
@@ -182,3 +155,4 @@ export default function ProductList() {
     </div>
   );
 }
+

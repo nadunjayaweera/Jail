@@ -19,6 +19,7 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import addSale from "./api/data.route.mjs";
 import getSale from "./api/data.route.mjs";
+import getSalesByDate from "./api/data.route.mjs";
 import updateOrderStatus from "./api/data.route.mjs";
 dotenv.config();
 const stripeSecretTest = process.env.STRIPE_SECRET_TEST;
@@ -82,7 +83,7 @@ app.use("/api/v1/", addSale); // add the data route
 app.use("/api/v1/", getSale); // add the data route
 app.use("/api/v1/", updateitem); // add the data route
 app.use("/api/v1/", deleteitem); // add the data route
-
+app.use("/api/v1/", getSalesByDate);
 app.use("*", (req, res) => res.status(404).json({ error: "not found" }));
 
 export default app;

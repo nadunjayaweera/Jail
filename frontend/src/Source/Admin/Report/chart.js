@@ -21,7 +21,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { format } from "date-fns-tz";
-
+import { DataGrid } from "@mui/x-data-grid";
 const monthLabels = [
   "January",
   "February",
@@ -52,6 +52,7 @@ const MonthlySales = () => {
         amount: item.amount,
       };
     }
+    console.log("Sale:", item);
     return result;
   }, []);
 
@@ -117,15 +118,13 @@ const Topsell = () => {
   const theme = useTheme();
 
   useEffect(() => {
-    // Get today's date and format it as "yyyy-MM-dd"
-    const formattedDate = value ? format(value, "MMMM d, yyyy") : null;
-
+    // Get today's date and format it as "yyyy/MM/dd"
+    const formattedDate = value ? format(value, "yyyy/MM/dd") : null;
+    console.log("Date", formattedDate);
     // Update the API URL with the formatted date
-    const apiUrl = `https://backfood.tfdatamaster.com/api/v1/data/sales?date=${encodeURIComponent(
-      formattedDate
-    )}`;
+    const apiUrl = `http://localhost:8084/api/v1/data/topsellingitems?date=${formattedDate}`;
 
-    console.log("API URL:", apiUrl); // Log the API URL
+    console.log("API URLllll:", apiUrl); // Log the API URL
 
     // Clear the data before making the API request
     setData([]);
@@ -143,7 +142,7 @@ const Topsell = () => {
           // Process the data into the format expected by PieChart
           const chartData = apiData.map((item) => ({
             id: item._id, // Assuming you want to use _id as the id property
-            value: item.totalQuantity,
+            value: item.count,
             label: item._id, // You can use _id as the label property
           }));
           setData(chartData);
@@ -160,7 +159,7 @@ const Topsell = () => {
 
   return (
     <div>
-      <h2>Top Selling Items</h2>
+      <Title>Top Selling Item</Title>
       <div>
         <label htmlFor="top-sell-date">Select Date: </label>
         <input
@@ -246,4 +245,86 @@ const Chart = () => {
   );
 };
 
-export { Chart, MonthlySales, Topsell };
+const Table = () => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [value, setValue] = useState(null);
+  const [mealType, setMealType] = useState(""); // Initial meal type is an empty string
+
+  useEffect(() => {
+    const formattedDate = value ? format(value, "yyyy/MM/dd") : null;
+    const apiUrl = `http://localhost:8084/api/v1/data/topsellingitems?date=${formattedDate}&mealType=${mealType}`;
+
+    setData([]); // Clear the data before making the API request
+
+    fetch(apiUrl)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((apiData) => {
+        if (Array.isArray(apiData) && apiData.length > 0) {
+          const tableData = apiData.map((item, index) => ({
+            id: index + 1, // You can adjust this based on your data structure
+            ...item,
+          }));
+          setData(tableData);
+        } else {
+          setData([]);
+        }
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        setLoading(false);
+      });
+  }, [value, mealType]);
+
+  const columns = [
+    { field: "_id", headerName: "Product Name", width: 200 },
+    { field: "count", headerName: "Count", width: 150 },
+  ];
+
+  return (
+    <div>
+      <Title>Total Orders</Title>
+      <div>
+        <label htmlFor="top-sell-date">Select Date: </label>
+        <input
+          type="date"
+          id="top-sell-date"
+          value={value ? format(value, "yyyy-MM-dd") : ""}
+          onChange={(e) => setValue(new Date(e.target.value))}
+        />
+      </div>
+      <div>
+        <label htmlFor="meal-type">Select Meal Type: </label>
+        <select
+          id="meal-type"
+          value={mealType}
+          onChange={(e) => setMealType(e.target.value)}
+        >
+          <option value="">All</option>
+          <option value="Breakfast">Breakfast</option>
+          <option value="Lunch">Lunch</option>
+          <option value="Diner">Dinner</option>
+        </select>
+      </div>
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <div style={{ height: "100%", width: "100%" }}>
+          {data.length > 0 ? (
+            <DataGrid rows={data} columns={columns} pageSize={5} />
+          ) : (
+            <p>No data available.</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export { Chart, MonthlySales, Topsell, Table };

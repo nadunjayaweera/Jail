@@ -58,7 +58,7 @@ export default function Orders() {
     const fetchSalesData = async () => {
       try {
         const response = await axios.get(
-          "https://backfood.tfdatamaster.com/api/v1/getsales"
+          "http://localhost:8084/api/v1/getsales"
         );
         console.log("API Response:", response.data);
 
@@ -85,10 +85,10 @@ export default function Orders() {
 
   const columns = [
     { field: "id", headerName: "ID", width: 120 },
-    { field: "orderid", headerName: "OrderID", width: 100 },
+    { field: "orderid", headerName: "OrderID", width: 150 },
     { field: "date", headerName: "Date", width: 250 },
-    { field: "name", headerName: "Name", width: 250 },
-    { field: "products", headerName: "Products", width: 250 },
+    { field: "name", headerName: "Name", width: 200 },
+    { field: "products", headerName: "Products", width: 550 },
     {
       field: "amount",
       headerName: "Amount (Rs. )",

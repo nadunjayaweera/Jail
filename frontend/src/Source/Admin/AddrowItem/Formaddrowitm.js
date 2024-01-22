@@ -124,16 +124,13 @@ export default function FormAddrowProduct() {
 
     // Send a POST request to the server
     try {
-      const response = await fetch(
-        "https://backfood.tfdatamaster.com/api/v1/addrowitem",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch("http://localhost:8084/api/v1/addrowitem", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
       if (response.ok) {
         alert("Item added successfully");
