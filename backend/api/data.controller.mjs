@@ -241,9 +241,9 @@ export default class DataController {
   // In data.controller.mjs
   static async getTopSellingItems(req, res, next) {
     const date = req.query.date;
-
+    const mealType = req.query.mealType;
     try {
-      const topSellingItems = await DataDAO.getTopSellingItems(date);
+      const topSellingItems = await DataDAO.getTopSellingItems(date, mealType);
       res.json(topSellingItems);
     } catch (err) {
       console.error(`Error getting top-selling items: ${err}`);

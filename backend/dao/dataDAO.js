@@ -408,7 +408,7 @@ export default class DataDAO {
     }
   }
 
-  static async getTopSellingItems(date) {
+  static async getTopSellingItems(date, mealType) {
     if (!orders) {
       throw new Error("DataDAO not initialized");
     }
@@ -423,18 +423,23 @@ export default class DataDAO {
         {
           $unwind: "$products",
         },
-        {
-          $match: {
-            "products.date": date,
-          },
-        },
-        {
-          $group: {
-            _id: "$products.productName",
-            count: { $sum: 1 },
-          },
-        },
       ];
+
+      // Conditionally add a match stage for meal type if provided
+      if (mealType) {
+        pipeline.push({
+          $match: {
+            "products.meal": mealType,
+          },
+        });
+      }
+
+      pipeline.push({
+        $group: {
+          _id: "$products.productName",
+          count: { $sum: 1 },
+        },
+      });
 
       const result = await orders.aggregate(pipeline).toArray();
       console.log("Result", result);
