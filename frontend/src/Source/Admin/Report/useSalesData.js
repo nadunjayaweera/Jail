@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import moment from "moment";
 
 const useSalesData = (dataType, numberOfDays) => {
   const [data, setData] = useState([]);
@@ -23,9 +24,14 @@ const useSalesData = (dataType, numberOfDays) => {
   const processMonthlyData = (salesData) => {
     console.log("SalesData", salesData);
     const groupedData = salesData.reduce((result, item) => {
-      const date = new Date(item.timestamp);
-      const month = date.getMonth() + 1; // Months are zero-indexed, so add 1
-      const year = date.getFullYear();
+      // Attempt to parse timestamp with moment
+      const date = moment(item.timestamp, "MMMM DD, YYYY [at] HH:mm:ss", true);
+      if (!date.isValid()) {
+        console.error("Invalid date format:", item.timestamp);
+        return result; // Skip invalid dates
+      }
+      const month = date.month() + 1; // Months are zero-indexed, so add 1
+      const year = date.year();
       const key = `${year}-${month}`;
       if (result[key]) {
         result[key].amount += parseInt(item.totalPrice);
@@ -41,6 +47,7 @@ const useSalesData = (dataType, numberOfDays) => {
     console.log("Date month:", groupedData);
     return Object.values(groupedData);
   };
+
   // Process daily data and return the last 'numberOfDays' days
   const processDailyData = (salesData, numberOfDays) => {
     // Sort sales data by timestamp in descending order (most recent first)
