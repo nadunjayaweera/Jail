@@ -5,7 +5,7 @@ const useSalesData = (dataType, numberOfDays) => {
 
   useEffect(() => {
     // Fetch sales data from backend API
-    fetch("http://localhost:8084/api/v1/getsales")
+    fetch("http://localhost:8084/api/v1/getsellindata")
       .then((response) => response.json())
       .then((salesData) => {
         // Process the sales data based on the dataType parameter
@@ -21,12 +21,12 @@ const useSalesData = (dataType, numberOfDays) => {
 
   // Process monthly data
   const processMonthlyData = (salesData) => {
+    console.log("SalesData", salesData);
     const groupedData = salesData.reduce((result, item) => {
       const date = new Date(item.timestamp);
       const month = date.getMonth() + 1; // Months are zero-indexed, so add 1
       const year = date.getFullYear();
       const key = `${year}-${month}`;
-      console.log("Monthly date:", key);
       if (result[key]) {
         result[key].amount += parseInt(item.totalPrice);
       } else {
@@ -38,10 +38,9 @@ const useSalesData = (dataType, numberOfDays) => {
       }
       return result;
     }, {});
-
+    console.log("Date month:", groupedData);
     return Object.values(groupedData);
   };
-
   // Process daily data and return the last 'numberOfDays' days
   const processDailyData = (salesData, numberOfDays) => {
     // Sort sales data by timestamp in descending order (most recent first)

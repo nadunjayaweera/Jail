@@ -14,7 +14,7 @@ router.get("/getsales", DataController.getSale);
 router.get("/getorders", DataController.getdailyorders);
 router.put("/updatedata", DataController.updateOrderStatus);
 router.get("/getuserorders/:email", DataController.getUserOrders);
-
+router.get("/getsellindata", DataController.getSalesdata);
 router.get("/topsellingitems", DataController.getTopSellingItems);
 
 router.get("/itempart", DataController.getItempart);

@@ -352,6 +352,23 @@ export default class DataDAO {
     }
   }
 
+  static async getSalesdata() {
+    if (!sale) {
+      throw new Error("DataDAO not initialized");
+    }
+
+    try {
+      const cursor = await sale
+        .find({})
+        .project({ timestamp: 1, totalPrice: 1 })
+        .toArray();
+      return cursor;
+    } catch (err) {
+      console.error(`Error getting data: ${err}`);
+      return { error: err };
+    }
+  }
+
   static async getdailyorders(meal) {
     if (!orders) {
       throw new Error("DataDAO not initialized");
