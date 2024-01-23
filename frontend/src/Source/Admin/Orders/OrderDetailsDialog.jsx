@@ -1,4 +1,5 @@
 import React from "react";
+import moment from "moment";
 import {
   Dialog,
   DialogTitle,
@@ -23,12 +24,12 @@ const OrderDetailsDialog = ({ open, onClose, orders }) => {
     display: "block",
     overflow: "hidden",
     border: "1px solid #000",
-    padding: "5px", // Reduce padding
-    marginBottom: "10px",
+    padding: "15px", // Increased padding
+    marginBottom: "30px", // Increased margin
     display: "flex",
-    justifyContent: "center", // Center the order details text
+    justifyContent: "center",
     flexDirection: "column",
-    fontSize: "12px", // Increase the base font size
+    fontSize: "12px",
   };
 
   const printRef = React.useRef();
@@ -66,7 +67,7 @@ const OrderDetailsDialog = ({ open, onClose, orders }) => {
       }
     }
   `;
-
+  const currentTime = moment().format("HH:mm:ss");
   return (
     <Dialog open={open} onClose={onClose}>
       <style media="print">{printStyles}</style>
@@ -78,38 +79,56 @@ const OrderDetailsDialog = ({ open, onClose, orders }) => {
             {orders.map((order) => (
               <div key={order.id} style={{ ...receiptStyles }}>
                 <div style={{ textAlign: "center", margin: "auto" }}>
-                  <strong>Mexican Hoppers</strong>
+                  <strong>Prison Food</strong>
                 </div>
-
+                <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                  <li style={listItemStyles}>
+                    {/* Customer Name: <span>{order.customerName}</span> */}
+                    Customer Name: <span>{order.name}</span>
+                  </li>
+                </ul>
+                <thead>
+                  <th>Customer Details</th>
+                </thead>
+                <tbody>
+                  <tbody>
+                    {order &&
+                      order.customerdetails.map((item, index) => (
+                        <tr key={index} style={{ marginBottom: "12px" }}>
+                          {Object.keys(item).map((key) => (
+                            <td key={key}>
+                              <span>
+                                {key}: {item[key]}
+                              </span>
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                  </tbody>
+                </tbody>
                 <div style={{ textAlign: "center", margin: "auto" }}>
                   <strong>Order ID:</strong> {order.orderid}
                 </div>
                 <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
                   <li style={listItemStyles}>
-                    Time & Date: <span>{order.time}</span>
+                    Print Time: <span>{currentTime}</span>
                   </li>
-
                   <li style={listItemStyles}>
                     <table style={{ width: "100%" }}>
                       <thead>
                         <th>#</th>
                         <th>Item</th>
-                        <th>Qty</th>
-                
                       </thead>
                       <tbody>
-                      {order &&
+                        {order &&
                           order.products.map((item, index) => (
                             <tr>
                               <td>{index + 1}</td>
                               <td>
                                 <span>{item.productName}</span>
                               </td>
-                              <td>{item.quantity}</td>
-                  
                             </tr>
                           ))}
-                      
                       </tbody>
                     </table>
                   </li>

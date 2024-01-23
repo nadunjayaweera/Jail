@@ -81,10 +81,13 @@ const OrdersDetails = ({ open, onClose, orders }) => {
                   <strong>Mexican Hoppers</strong>
                 </div>
                 <div style={{ textAlign: "center", margin: "auto" }}>
-                  <strong>Address: No.15, Madiwela Road,<br/> Thalawathugoda, Sri Lanka.</strong>
+                  <strong>
+                    Address: No.15, Madiwela Road,
+                    <br /> Thalawathugoda, Sri Lanka.
+                  </strong>
                 </div>
                 <div style={{ textAlign: "center", margin: "auto" }}>
-                  <strong>Mobile: 011  2 87 14 14</strong>
+                  <strong>Mobile: 011 2 87 14 14</strong>
                 </div>
                 <div style={{ textAlign: "center", margin: "auto" }}>
                   <strong>Order ID:</strong> {order.orderid}
@@ -112,20 +115,14 @@ const OrdersDetails = ({ open, onClose, orders }) => {
                               <td>
                                 <span>{item.productName}</span>
                               </td>
-                              <td>{item.quantity}</td>
-                              <td>{parseFloat(item.price).toFixed(2)}</td>
                             </tr>
                           ))}
                       </tbody>
                     </table>
                   </li>
 
-                  <li style={listItemStyles}>
-                    Subtotal: <span>Rs{order.price.toFixed(2)}</span>
-                  </li>
-                  <li style={listItemStyles}>
-                    Total Pay: <span>Rs{order.price.toFixed(2)}</span>
-                  </li>
+                  <li style={listItemStyles}></li>
+                  <li style={listItemStyles}></li>
                 </ul>
               </div>
             ))}

@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { alpha, styled } from "@mui/material/styles";
 import { DataGrid, gridClasses } from "@mui/x-data-grid";
-import { Link } from "react-router-dom";
 import { IconButton } from "@mui/material";
 import axios from "axios";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import OrderDetailsDialog from "./OrderDetailsDialog";
-import PrintIcon from "@mui/icons-material/Print";
 import OrdersDetails from "./OrdersDetails";
 
 const ODD_OPACITY = 0.2;
@@ -50,32 +48,35 @@ export default function ProductList() {
   const [selectedOrder, setSelectedOrder] = React.useState([]); // Initialize as an empty array
   const [openDialog, setOpenDialog] = React.useState(false);
   const [openDialog2, setOpenDialog2] = React.useState(false);
+  const [selectedMeal, setSelectedMeal] = React.useState("Breakfast"); // Default meal type
 
-  React.useEffect(() => {
+  const handleMealChange = (event) => {
+    const newMeal = event.target.value;
+    console.log("Selected Meal:", newMeal);
+    setSelectedMeal(newMeal);
+  };
+
+  useEffect(() => {
     const fetchSalesData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8084/api/v1/getsales"
+          `http://localhost:8084/api/v1/data/getorders?meal=${selectedMeal}`
         );
+        console.log("Response:", response);
         const salesData = response.data;
-        const currentDate = new Date().toISOString().split("T")[0];
-        salesData.sort((a, b) => new Date(b.orderId) - new Date(a.orderId));
-        const todayOrders = salesData.filter(
-          (product) => product.timestamp.split("T")[0] === currentDate
-        );
+        salesData.sort((a, b) => new Date(b.kotId) - new Date(a.kotId));
+
         const formattedSalesData = salesData.map((product, index) => ({
           id: index + 1,
           feeldid: product._id,
           pid: product.id,
           name: product.customerName,
           products: product.products,
-          price: product.totalPrice,
-          time: product.timestamp,
-          email: product.email,
+          customerdetails: product.customerdetails,
+          mobileno: product.mobileno,
           orders: product.productName,
-          orderid: product.orderId,
-          // quantity: product.orders.length,
-          orderstatus: product.productStatus,
+          orderid: product.kotId,
+          orderstatus: product.orderstatus,
         }));
 
         console.log("Sales Data:", formattedSalesData);
@@ -86,14 +87,14 @@ export default function ProductList() {
     };
 
     fetchSalesData();
-  }, []);
+  }, [selectedMeal]); // Include selectedMeal in the dependency array
 
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
     { field: "name", headerName: "Name", width: 200 },
     {
-      field: "price",
-      headerName: "Price (Rs.)",
+      field: "mobileno",
+      headerName: "Mobile NO",
       type: "number",
       width: 120,
     },
@@ -132,13 +133,6 @@ export default function ProductList() {
           >
             <VisibilityIcon />
           </IconButton>
-          <IconButton
-            color="primary"
-            size="small"
-            onClick={() => handleViewOrders2(params.row)}
-          >
-            <PrintIcon />
-          </IconButton>
         </React.Fragment>
       ),
     },
@@ -159,13 +153,6 @@ export default function ProductList() {
       ),
     },
   ];
-
-  const handlePrint = (orderid, orders) => {
-    console.log("Printing Order ID:", orderid);
-    console.log("Printing Orders:", orders);
-
-    window.print();
-  };
 
   const getStatusColor = (orderstatus) => {
     switch (orderstatus) {
@@ -195,34 +182,34 @@ export default function ProductList() {
     setOpenDialog(false);
     setSelectedOrder(null);
   };
+
   const handleCloseDialog2 = () => {
     setOpenDialog2(false);
     setSelectedOrder(null);
   };
 
-  const handleUpdateStatus = async (feeldid) => {
+  const handleUpdateStatus = async (feeldid, orderstatus) => {
     try {
       // Make an API request to update the order status
-      await axios.put(
-        `http://localhost:8084/api/v1/${feeldid}/update-data`,
-        {}
-      );
+      await axios.put(`http://localhost:8084/api/v1/${feeldid}/update-data`, {
+        orderstatus,
+      });
 
       // Fetch the updated sales data
-      const response = await axios.get("http://localhost:8084/api/v1/getsales");
+      const response = await axios.get(
+        `http://localhost:8084/api/v1/data/getorders?meal=${selectedMeal}`
+      );
       const updatedSalesData = response.data.map((product, index) => ({
         id: index + 1,
         feeldid: product._id,
         pid: product.id,
         name: product.customerName,
         products: product.products,
-        price: product.totalPrice,
-        time: product.timestamp,
-        email: product.email,
+        customerdetails: product.customerdetails,
+        mobileno: product.mobileno,
         orders: product.productName,
         orderid: product.orderId,
-        // quantity: product.orders.length,
-        orderstatus: product.productStatus,
+        orderstatus: product.orderstatus,
       }));
 
       // Update the sales data state with the updated data
@@ -234,6 +221,19 @@ export default function ProductList() {
 
   return (
     <div style={{ height: "100%", width: "100%" }}>
+      {/* Add a dropdown for meal selection */}
+      <div style={{ marginBottom: 16 }}>
+        <label htmlFor="mealSelect">Select Meal: </label>
+        <select
+          id="mealSelect"
+          value={selectedMeal}
+          onChange={handleMealChange}
+        >
+          <option value="Breakfast">Breakfast</option>
+          <option value="Lunch">Lunch</option>
+          <option value="Diner">Dinner</option>
+        </select>
+      </div>
       <StripedDataGrid
         rows={salesData}
         columns={columns}
