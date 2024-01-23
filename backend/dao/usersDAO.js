@@ -11,7 +11,9 @@ class UsersDAO {
       return;
     }
     try {
-      users = await conn.db(process.env.DATA_BASE_NAME).collection("users");
+      users = await conn
+        .db(process.env.DATA_BASE_NAME)
+        .collection("loggedinUsers");
     } catch (e) {
       console.error(`Unable to establish collection handles in UsersDAO: ${e}`);
     }

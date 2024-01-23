@@ -55,8 +55,23 @@ export default function Users() {
       width: 130,
     },
     {
-      field: "email",
-      headerName: <div style={{ textAlign: "left" }}>Email</div>,
+      field: "mobileno",
+      headerName: <div style={{ textAlign: "left" }}>Mobile NO</div>,
+      width: 200,
+    },
+    {
+      field: "employeeid",
+      headerName: <div style={{ textAlign: "left" }}>Employee ID</div>,
+      width: 200,
+    },
+    {
+      field: "designation",
+      headerName: <div style={{ textAlign: "left" }}>Designation</div>,
+      width: 200,
+    },
+    {
+      field: "section",
+      headerName: <div style={{ textAlign: "left" }}>Section</div>,
       width: 200,
     },
   ];
@@ -70,7 +85,7 @@ export default function Users() {
       })
       .catch((error) => console.error(error));
   }, []);
-
+  console.log("User data", rows);
   return (
     <div style={{ height: 400, width: "100%" }}>
       <StripedDataGrid
