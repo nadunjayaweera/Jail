@@ -39,6 +39,7 @@ export default class DataDAO {
     customerdetails,
     products,
     totalPrice,
+    paymentmethod = "card",
     mobileno,
     role
   ) {
@@ -93,6 +94,7 @@ export default class DataDAO {
         customerdetails,
         products,
         totalPrice,
+        paymentmethod,
         timestamp,
         mobileno,
         role,
@@ -352,7 +354,7 @@ export default class DataDAO {
     }
   }
 
-  static async getSalesdata() {
+  static async getSalesdata(startdate, enddate) {
     if (!sale) {
       throw new Error("DataDAO not initialized");
     }
@@ -360,7 +362,29 @@ export default class DataDAO {
     try {
       const cursor = await sale
         .find({})
-        .project({ timestamp: 1, totalPrice: 1 })
+        .project({ timestamp: 1, totalPrice: 1, paymentmethod: 1 })
+        .toArray();
+      return cursor;
+    } catch (err) {
+      console.error(`Error getting data: ${err}`);
+      return { error: err };
+    }
+  }
+
+  static async getSalesreport(startdate, enddate) {
+    if (!sale) {
+      throw new Error("DataDAO not initialized");
+    }
+
+    try {
+      const cursor = await sale
+        .find({
+          timestamp: {
+            $gte: new Date(startdate), // greater than or equal to startdate
+            $lte: new Date(enddate), // less than or equal to enddate
+          },
+        })
+        .project({ timestamp: 1, totalPrice: 1, paymentmethod: 1 })
         .toArray();
       return cursor;
     } catch (err) {

@@ -67,12 +67,12 @@ export default function Users() {
     {
       field: "designation",
       headerName: <div style={{ textAlign: "left" }}>Designation</div>,
-      width: 200,
+      width: 150,
     },
     {
       field: "section",
       headerName: <div style={{ textAlign: "left" }}>Section</div>,
-      width: 200,
+      width: 150,
     },
   ];
 

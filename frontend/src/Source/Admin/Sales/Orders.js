@@ -50,6 +50,7 @@ function CustomToolbar() {
     </GridToolbarContainer>
   );
 }
+
 export default function Orders() {
   const [editRowsModel, setEditRowsModel] = React.useState({});
   const [salesData, setSalesData] = React.useState([]);
@@ -68,8 +69,20 @@ export default function Orders() {
           name: sale.customerName,
           orderid: sale.orderId,
           amount: sale.totalPrice,
+          paymentmethod: sale.paymentmethod,
           products: sale.products
-            .map((product) => `${product.productName} - ${product.quantity}`)
+            .map(
+              (product) =>
+                `${product.productName} (Date: ${product.date}, Meal: ${product.meal}, Price: ${product.price})`
+            )
+            .join(", "),
+          customerdetails: sale.customerdetails
+            .map(
+              (details) =>
+                `${Object.keys(details)
+                  .map((key) => `${key}: ${details[key]}`)
+                  .join(", ")}`
+            )
             .join(", "),
         }));
 
@@ -89,12 +102,14 @@ export default function Orders() {
     { field: "date", headerName: "Date", width: 250 },
     { field: "name", headerName: "Name", width: 200 },
     { field: "products", headerName: "Products", width: 550 },
+    { field: "customerdetails", headerName: "Customer Details", width: 550 },
     {
       field: "amount",
       headerName: "Amount (Rs. )",
       type: "number",
       width: 100,
     },
+    { field: "paymentmethod", headerName: "Payment Method", width: 150 },
   ];
 
   return (

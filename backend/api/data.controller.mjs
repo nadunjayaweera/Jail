@@ -195,6 +195,7 @@ export default class DataController {
         customerdetails,
         products,
         totalPrice,
+        paymentmethod,
         mobileno,
         role,
       } = req.body;
@@ -203,6 +204,7 @@ export default class DataController {
         customerdetails,
         products,
         totalPrice,
+        paymentmethod,
         mobileno,
         role
       );
@@ -230,6 +232,28 @@ export default class DataController {
   static async getSalesdata(req, res, next) {
     try {
       const data = await DataDAO.getSalesdata();
+      res.json(data);
+    } catch (err) {
+      console.error(`Error getting data: ${err}`);
+      res.status(500).json({ error: err });
+    }
+  }
+
+  static async getSalesdata(req, res, next) {
+    try {
+      const data = await DataDAO.getSalesdata();
+      res.json(data);
+    } catch (err) {
+      console.error(`Error getting data: ${err}`);
+      res.status(500).json({ error: err });
+    }
+  }
+
+  static async getSalesreport(req, res, next) {
+    const startdate = req.query.startdate;
+    const enddate = req.query.enddate;
+    try {
+      const data = await DataDAO.getSalesdata(startdate, enddate);
       res.json(data);
     } catch (err) {
       console.error(`Error getting data: ${err}`);

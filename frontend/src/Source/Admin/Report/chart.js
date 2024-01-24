@@ -13,12 +13,12 @@ import {
   Pie,
 } from "recharts";
 import Title from "../title";
+import Card from "@mui/material/Card";
 import { EventTracker } from "@devexpress/dx-react-chart";
 import useSalesData from "./useSalesData";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+
 import { PieChart } from "@mui/x-charts/PieChart";
 import { format } from "date-fns-tz";
 import { DataGrid } from "@mui/x-data-grid";
@@ -108,6 +108,88 @@ const MonthlySales = () => {
         </LineChart>
       </ResponsiveContainer>
     </React.Fragment>
+  );
+};
+
+const SalesReport = () => {
+  const theme = useTheme();
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [totalAmount, setTotalAmount] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!startDate || !endDate) {
+        console.error("Please select both start and end dates.");
+        return;
+      }
+
+      try {
+        // Use your API endpoint here
+        const apiUrl = `http://localhost:8084/api/v1/getsalesreports?startdate=${format(
+          startDate,
+          "yyyy/MM/dd"
+        )}&enddate=${format(endDate, "yyyy/MM/dd")}`;
+
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        console.log("response", response);
+        const data = await response.json();
+        // Process the data and calculate the total amount
+        const total = data.reduce((acc, item) => acc + item.totalPrice, 0);
+        setTotalAmount(total);
+      } catch (error) {
+        console.error("Error fetching sales report:", error);
+      }
+    };
+
+    fetchData();
+  }, [startDate, endDate]);
+
+  return (
+    <div>
+      <Title>Sales Report</Title>
+      <div>
+        <label htmlFor="start-date">Start Date: </label>
+        <input
+          type="date"
+          id="start-date"
+          value={startDate ? format(startDate, "yyyy-MM-dd") : ""}
+          onChange={(e) => setStartDate(new Date(e.target.value))}
+        />
+      </div>
+      <div>
+        <label htmlFor="end-date">End Date: </label>
+        <input
+          type="date"
+          id="end-date"
+          value={endDate ? format(endDate, "yyyy-MM-dd") : ""}
+          onChange={(e) => setEndDate(new Date(e.target.value))}
+        />
+      </div>
+
+      {totalAmount !== null && (
+        <Card
+          component={Stack}
+          spacing={3}
+          direction="row"
+          sx={{
+            px: 3,
+            py: 5,
+            borderRadius: 2,
+          }}
+        >
+          <Stack spacing={0.5}>
+            <Typography variant="h4">{totalAmount}</Typography>
+            <Typography variant="subtitle2" sx={{ color: "text.disabled" }}>
+              Total Sales Amount
+            </Typography>
+          </Stack>
+        </Card>
+      )}
+    </div>
   );
 };
 
@@ -327,4 +409,4 @@ const Table = () => {
   );
 };
 
-export { Chart, MonthlySales, Topsell, Table };
+export { Chart, MonthlySales, Topsell, Table, SalesReport };
