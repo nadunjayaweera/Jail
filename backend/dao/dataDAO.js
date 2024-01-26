@@ -354,7 +354,7 @@ export default class DataDAO {
     }
   }
 
-  static async getSalesdata(startdate, enddate) {
+  static async getSalesdata() {
     if (!sale) {
       throw new Error("DataDAO not initialized");
     }
@@ -362,7 +362,7 @@ export default class DataDAO {
     try {
       const cursor = await sale
         .find({})
-        .project({ timestamp: 1, totalPrice: 1, paymentmethod: 1 })
+        .project({ timestamp: 1, totalPrice: 1 })
         .toArray();
       return cursor;
     } catch (err) {
@@ -372,24 +372,65 @@ export default class DataDAO {
   }
 
   static async getSalesreport(startdate, enddate) {
-    if (!sale) {
-      throw new Error("DataDAO not initialized");
-    }
-
     try {
-      const cursor = await sale
-        .find({
-          timestamp: {
-            $gte: new Date(startdate), // greater than or equal to startdate
-            $lte: new Date(enddate), // less than or equal to enddate
-          },
+      if (!sale) {
+        throw new Error("DataDAO not initialized");
+      }
+
+      const parsedStartDate = new Date(startdate);
+      const parsedEndDate = new Date(enddate);
+      // Set endDate to include the entire day
+      parsedEndDate.setHours(23, 59, 59, 999);
+
+      const formattedStartDate = `${parsedStartDate.toLocaleDateString(
+        "en-US",
+        {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        }
+      )} at ${parsedStartDate.toLocaleTimeString("en-US", {
+        hour12: false,
+      })}`;
+
+      const formattedEndDate = parsedEndDate
+        .toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
         })
-        .project({ timestamp: 1, totalPrice: 1, paymentmethod: 1 })
+        .concat(" at ")
+        .concat(parsedEndDate.toLocaleTimeString());
+
+      // Define the date range filter and specify projected fields
+      const dateRangeFilter = {
+        timestamp: {
+          $gte: formattedStartDate,
+          $lte: formattedEndDate,
+        },
+      };
+
+      const projection = {
+        _id: 0, // Exclude _id field
+        timestamp: 1,
+        totalPrice: 1,
+        paymentmethod: 1,
+      };
+
+      console.log("MongoDB Query:", dateRangeFilter);
+      console.log("Projection:", projection);
+
+      // Fetch records with specified date range and projection
+      const salesreport = await sale
+        .find(dateRangeFilter)
+        .project(projection)
         .toArray();
-      return cursor;
+      console.log("Salesreport", salesreport);
+
+      return salesreport;
     } catch (err) {
       console.error(`Error getting data: ${err}`);
-      return { error: err };
+      return { error: err.message || "An error occurred" };
     }
   }
 

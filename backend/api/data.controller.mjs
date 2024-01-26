@@ -252,12 +252,14 @@ export default class DataController {
   static async getSalesreport(req, res, next) {
     const startdate = req.query.startdate;
     const enddate = req.query.enddate;
+    console.log("Start End Dateee", startdate, enddate);
     try {
-      const data = await DataDAO.getSalesdata(startdate, enddate);
+      const data = await DataDAO.getSalesreport(startdate, enddate);
       res.json(data);
+      console.log("Data", data);
     } catch (err) {
       console.error(`Error getting data: ${err}`);
-      res.status(500).json({ error: err });
+      res.status(500).json({ error: err.message || "An error occurred" });
     }
   }
 
@@ -272,7 +274,6 @@ export default class DataController {
     }
   }
 
-  // In data.controller.mjs
   static async getTopSellingItems(req, res, next) {
     const date = req.query.date;
     const mealType = req.query.mealType;
