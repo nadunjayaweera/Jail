@@ -112,10 +112,11 @@ const MonthlySales = () => {
 };
 
 const SalesReport = () => {
-  const theme = useTheme();
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [totalAmount, setTotalAmount] = useState(null);
+  const [totalCardPayment, setTotalCardPayment] = useState(null);
+  const [totalCashPayment, setTotalCashPayment] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -135,11 +136,30 @@ const SalesReport = () => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-        console.log("response", response);
+
         const data = await response.json();
-        // Process the data and calculate the total amount
+
+        // Process the data and calculate totals
         const total = data.reduce((acc, item) => acc + item.totalPrice, 0);
         setTotalAmount(total);
+
+        const cardPayments = data.filter(
+          (item) => item.paymentmethod.toLowerCase() === "card"
+        );
+        const totalCard = cardPayments.reduce(
+          (acc, item) => acc + item.totalPrice,
+          0
+        );
+        setTotalCardPayment(totalCard);
+
+        const cashPayments = data.filter(
+          (item) => item.paymentmethod.toLowerCase() === "cash"
+        );
+        const totalCash = cashPayments.reduce(
+          (acc, item) => acc + item.totalPrice,
+          0
+        );
+        setTotalCashPayment(totalCash);
       } catch (error) {
         console.error("Error fetching sales report:", error);
       }
@@ -185,6 +205,46 @@ const SalesReport = () => {
             <Typography variant="h4">{totalAmount}</Typography>
             <Typography variant="subtitle2" sx={{ color: "text.disabled" }}>
               Total Sales Amount
+            </Typography>
+          </Stack>
+        </Card>
+      )}
+
+      {totalCashPayment !== null && (
+        <Card
+          component={Stack}
+          spacing={3}
+          direction="row"
+          sx={{
+            px: 3,
+            py: 5,
+            borderRadius: 2,
+          }}
+        >
+          <Stack spacing={0.5}>
+            <Typography variant="h4">{totalCashPayment}</Typography>
+            <Typography variant="subtitle2" sx={{ color: "text.disabled" }}>
+              Total Cash Payment
+            </Typography>
+          </Stack>
+        </Card>
+      )}
+
+      {totalCardPayment !== null && (
+        <Card
+          component={Stack}
+          spacing={3}
+          direction="row"
+          sx={{
+            px: 3,
+            py: 5,
+            borderRadius: 2,
+          }}
+        >
+          <Stack spacing={0.5}>
+            <Typography variant="h4">{totalCardPayment}</Typography>
+            <Typography variant="subtitle2" sx={{ color: "text.disabled" }}>
+              Total Card Payment
             </Typography>
           </Stack>
         </Card>
