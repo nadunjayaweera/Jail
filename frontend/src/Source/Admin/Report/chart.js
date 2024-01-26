@@ -190,65 +190,82 @@ const SalesReport = () => {
         />
       </div>
 
-      {totalAmount !== null && (
-        <Card
-          component={Stack}
-          spacing={3}
-          direction="row"
-          sx={{
-            px: 3,
-            py: 5,
-            borderRadius: 2,
-          }}
-        >
-          <Stack spacing={0.5}>
-            <Typography variant="h4">{totalAmount}</Typography>
-            <Typography variant="subtitle2" sx={{ color: "text.disabled" }}>
-              Total Sales Amount
-            </Typography>
-          </Stack>
-        </Card>
-      )}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
+        {totalAmount !== null && (
+          <Card
+            component={Stack}
+            spacing={3}
+            direction="row"
+            sx={{
+              px: 3,
+              py: 5,
+              borderRadius: 2,
+              backgroundColor: "#f0f8e3",
+              boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+              border: "1px solid #c5e1a5",
+            }}
+          >
+            <Stack spacing={0.5}>
+              <Typography variant="h4">{totalAmount}</Typography>
+              <Typography variant="subtitle2" sx={{ color: "text.disabled" }}>
+                Total Sales Amount
+              </Typography>
+            </Stack>
+          </Card>
+        )}
 
-      {totalCashPayment !== null && (
-        <Card
-          component={Stack}
-          spacing={3}
-          direction="row"
-          sx={{
-            px: 3,
-            py: 5,
-            borderRadius: 2,
-          }}
-        >
-          <Stack spacing={0.5}>
-            <Typography variant="h4">{totalCashPayment}</Typography>
-            <Typography variant="subtitle2" sx={{ color: "text.disabled" }}>
-              Total Cash Payment
-            </Typography>
-          </Stack>
-        </Card>
-      )}
+        {totalCashPayment !== null && (
+          <Card
+            component={Stack}
+            spacing={3}
+            direction="row"
+            sx={{
+              px: 3,
+              py: 5,
+              borderRadius: 2,
+              backgroundColor: "#f0f8e3",
+              boxShadow: "0px 2px 4px rgba (0,0,0,0.1)",
+              border: "1px solid #c5e1a5",
+            }}
+          >
+            <Stack spacing={0.5}>
+              <Typography variant="h4">{totalCashPayment}</Typography>
+              <Typography variant="subtitle2" sx={{ color: "text.disabled" }}>
+                Total Cash Payment
+              </Typography>
+            </Stack>
+          </Card>
+        )}
 
-      {totalCardPayment !== null && (
-        <Card
-          component={Stack}
-          spacing={3}
-          direction="row"
-          sx={{
-            px: 3,
-            py: 5,
-            borderRadius: 2,
-          }}
-        >
-          <Stack spacing={0.5}>
-            <Typography variant="h4">{totalCardPayment}</Typography>
-            <Typography variant="subtitle2" sx={{ color: "text.disabled" }}>
-              Total Card Payment
-            </Typography>
-          </Stack>
-        </Card>
-      )}
+        {totalCardPayment !== null && (
+          <Card
+            component={Stack}
+            spacing={3}
+            direction="row"
+            sx={{
+              px: 3,
+              py: 5,
+              borderRadius: 2,
+              backgroundColor: "#f0f8e3",
+              boxShadow: "0px 2px 4px rgba (0, 0, 0, 0.1)",
+              border: "1px solid rgba #c5e1a5",
+            }}
+          >
+            <Stack spacing={0.5}>
+              <Typography variant="h4">{totalCardPayment}</Typography>
+              <Typography variant="subtitle2" sx={{ color: "text.disabled" }}>
+                Total Card Payment
+              </Typography>
+            </Stack>
+          </Card>
+        )}
+      </div>
     </div>
   );
 };
