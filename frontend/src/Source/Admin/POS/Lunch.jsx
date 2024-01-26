@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import SwipeableViews from "react-swipeable-views";
 import axios from "axios";
+import moment from "moment";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -51,7 +52,7 @@ export default function ItemCard({ addToCart }) {
           "https://backprison.talentfort.live/api/v1/data/itemscategoryvice?category=Lunch"
         );
         const formattedProductData = response.data.map((product) => ({
-          id: product._id,
+          itemid: product.itemid,
           name: product.name,
           price: product.price,
           description: product.description,
@@ -76,8 +77,30 @@ export default function ItemCard({ addToCart }) {
   };
 
   const handleAddToCart = () => {
+    console.log("product data = ", productData);
+
+    console.log("selected Product = ", selectedProduct);
+
+    console.log("selected Date  = ", selectedDate);
+
     if (selectedProduct && selectedDate) {
+      // Add to cart using the existing addToCart function
       addToCart({ product: selectedProduct, date: selectedDate });
+
+      const { itemid, name, price, category } = selectedProduct; // Extract the product details
+      const cartItem = {
+        productId: itemid,
+        date: selectedDate,
+        name,
+        price,
+        category,
+      };
+
+      // Save in local storage
+      const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
+      const updatedCart = [...existingCart, cartItem];
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+
       handleCloseModal();
     }
   };
@@ -91,27 +114,24 @@ export default function ItemCard({ addToCart }) {
   };
 
   const renderDateCheckboxes = () => {
-    const currentDate = new Date();
+    const currentDate = moment();
     const checkboxes = [];
-    for (let i = 0; i < 3; i++) {
-      const checkboxDate = new Date();
-      checkboxDate.setDate(currentDate.getDate() + i);
-      const formattedDate = `${checkboxDate.getDate()} ${checkboxDate.toLocaleString(
-        "default",
-        {
-          month: "short",
-        }
-      )}`;
+    const startDay = currentDate.hours() < 10 ? 0 : 1;
+
+    for (let i = startDay; i < startDay + 3; i++) {
+      const checkboxDate = moment().add(i, "days");
+      const formattedDate = checkboxDate.format("D MMM");
       checkboxes.push(
         <FormGroup key={i}>
           <FormControlLabel
             control={<Checkbox />}
             label={`${formattedDate}`}
-            onClick={() => handleDateSelection(checkboxDate)}
+            onClick={() => handleDateSelection(checkboxDate.toDate())}
           />
         </FormGroup>
       );
     }
+
     setDateCheckboxes(checkboxes);
   };
 
@@ -125,6 +145,18 @@ export default function ItemCard({ addToCart }) {
       renderDateCheckboxes();
     }
   }, [modalOpen]);
+
+  const isOrderAllowed = () => {
+    const currentTime = moment();
+
+    // If current time is between 12:00 am and 11:00 am, staff can place an order
+    if (currentTime.hours() >= 0 && currentTime.hours() < 11) {
+      return true;
+    } else {
+      // If current time is between 11:01 am and 11:59 pm, staff cannot place an order
+      return false;
+    }
+  };
 
   return (
     <div style={{ display: "flex", flexWrap: "wrap" }}>
@@ -160,11 +192,12 @@ export default function ItemCard({ addToCart }) {
             left: "50%",
             bgcolor: "background.paper",
             transform: "translate(-50%, -50%)",
-            width: 1200,
-            height: 600,
+            width: 500,
+            height: 400,
             boxShadow: 24,
             p: 4,
             minHeight: 200,
+            borderRadius: "10px",
           }}
         >
           <AppBar position="static" color="default">
@@ -176,8 +209,8 @@ export default function ItemCard({ addToCart }) {
               variant="fullWidth"
               aria-label="action tabs example"
             >
-              <Tab label="staff" />
-              <Tab label="Prison " />
+              <Tab label="Prisoner" />
+              <Tab label="Prisoner Staff " />
             </Tabs>
           </AppBar>
           <SwipeableViews
@@ -189,23 +222,75 @@ export default function ItemCard({ addToCart }) {
               {dateCheckboxes.map((checkbox, index) => (
                 <div key={index}>{checkbox}</div>
               ))}
+              <div
+                className="che"
+                style={{ textAlign: "center", marginTop: "10px" }}
+              >
+                <Button
+                  variant="contained"
+                  style={{
+                    width: "200px",
+                    height: "40px",
+                    borderRadius: "10px",
+                    marginBottom: "10px", // Add margin to create a gap
+                  }}
+                  onClick={handleAddToCart}
+                >
+                  Add to Cart
+                </Button>
+
+                <Button
+                  variant="soft"
+                  style={{
+                    width: "340px",
+                    height: "40px",
+                    borderRadius: "10px",
+                  }}
+                  onClick={handleCloseModal}
+                >
+                  Close
+                </Button>
+              </div>
             </TabPanel>
-            <TabPanel value={value} index={1} dir="ltr"></TabPanel>
+            <TabPanel value={value} index={1} dir="ltr">
+              <div
+                className="che"
+                style={{ textAlign: "center", marginTop: "10px" }}
+              >
+                {isOrderAllowed() ? (
+                  <>
+                    <Button
+                      variant="contained"
+                      style={{
+                        width: "340px",
+                        height: "40px",
+                        borderRadius: "10px",
+                        marginBottom: "10px",
+                      }}
+                      onClick={handleAddToCart}
+                    >
+                      Add to Cart
+                    </Button>
+
+                    <Button
+                      variant="soft"
+                      style={{
+                        width: "340px",
+                        height: "40px",
+                        borderRadius: "10px",
+                      }}
+                      onClick={handleCloseModal}
+                    >
+                      Close
+                    </Button>
+                  </>
+                ) : (
+                  <p>Staff Cannot Place Order Right Now</p>
+                )}
+              </div>
+            </TabPanel>
           </SwipeableViews>
-          <Button onClick={handleCloseModal}>Close</Button>
           <br />
-          <Button
-            variant="contained"
-            style={{
-              marginRight: "10px",
-              width: "200px",
-              height: "40px",
-              borderRadius: "10px",
-            }}
-            onClick={handleAddToCart}
-          >
-            Add to Cart
-          </Button>
         </Box>
       </Modal>
     </div>

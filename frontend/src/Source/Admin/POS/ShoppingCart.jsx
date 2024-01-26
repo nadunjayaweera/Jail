@@ -1,70 +1,66 @@
-// ShoppingCart.jsx
 import React from "react";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
 
 export default function ShoppingCart({ cart, removeFromCart }) {
+  const handleRemove = (index) => {
+    // Remove from cart state
+    removeFromCart(index);
+
+    const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
+    existingCart.splice(index, 1);
+    localStorage.setItem("cart", JSON.stringify(existingCart));
+  };
+
   return (
-    <div>
-      {cart.map((item, index) => ( 
-        <div key={item.product.id}>
-          <Card
-            sx={{
-              display: "flex",
-              width: 400,
-              height: 150,
-            }}
-          >
-            <CardMedia
-              component="img"
-              alt={item.product.name}
-              height="100"
-              src={`data:image/jpeg;base64,${item.product.image}`}
-              sx={{
-                width: 200,
-                height: 100,
-                flexShrink: 0,
-              }}
-            />
-            <CardContent
-              sx={{
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-              }}
-            >
-              <div>
-                <Typography gutterBottom variant="h6" component="div">
+    <TableContainer component={Paper}>
+      <Table aria-label="cart table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Product Name</TableCell>
+            <TableCell>Price</TableCell>
+            <TableCell>Date</TableCell>
+            <TableCell>Action</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {cart.map((item, index) => (
+            <TableRow key={item.product.id}>
+              <TableCell>
+                <Typography variant="subtitle1">
                   {item.product.name}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Price: {item.product.price}
+              </TableCell>
+              <TableCell>
+                <Typography variant="subtitle1">
+                  {item.product.price}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Date: {item.date.toDateString()}{" "}
-                  {/* Adjust this line to display the date in the desired format */}
+              </TableCell>
+              <TableCell>
+                <Typography variant="subtitle1">
+                  {item.date ? item.date.toDateString() : "N/A"}
                 </Typography>
-              </div>
-              <Button
-                variant="contained"
-                color="error"
-                onClick={() => removeFromCart(index)} // Pass the index directly
-                sx={{
-                  width: "100px", // Adjust the width as needed
-                  height: "30px", // Adjust the height as needed
-                }}
-              >
-                Remove
-              </Button>
-            </CardContent>
-          </Card>
-          <hr />
-        </div>
-      ))}
-    </div>
+              </TableCell>
+              <TableCell>
+                <IconButton
+                  color="error"
+                  onClick={() => handleRemove(index)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 }
