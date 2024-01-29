@@ -21,6 +21,8 @@ import addSale from "./api/data.route.mjs";
 import getSale from "./api/data.route.mjs";
 import getSalesByDate from "./api/data.route.mjs";
 import updateOrderStatus from "./api/data.route.mjs";
+import tax from "./api/tax/tax.route.mjs";
+
 dotenv.config();
 const stripeSecretTest = process.env.STRIPE_SECRET_TEST;
 const stripeInstance = stripe(stripeSecretTest);
@@ -84,6 +86,7 @@ app.use("/api/v1/", getSale); // add the data route
 app.use("/api/v1/", updateitem); // add the data route
 app.use("/api/v1/", deleteitem); // add the data route
 app.use("/api/v1/", getSalesByDate);
+app.use("/api/v1/", tax);
 app.use("*", (req, res) => res.status(404).json({ error: "not found" }));
 
 export default app;
