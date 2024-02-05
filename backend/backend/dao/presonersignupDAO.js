@@ -2,42 +2,34 @@ import mongodb from "mongodb";
 import dotenv from "dotenv";
 dotenv.config();
 const ObjectId = mongodb.ObjectID;
+import { sendSMS } from "../services/smsgateway.js";
 
-let users;
-let loggedinUsers;
+let presoners;
+let loggedinPrisoners;
 
-export default class SignupDAO {
+export default class PresonnerSignupDAO {
   static async injectDB(conn) {
-    if (users && loggedinUsers) {
+    if (presoners && loggedinPrisoners) {
       return;
     }
     try {
-      users = await conn.db(process.env.DATA_BASE_NAME).collection("users");
-      loggedinUsers = await conn
+      presoners = await conn
+        .db(process.env.DATA_BASE_NAME)
+        .collection("presoners");
+      loggedinPrisoners = await conn
         .db(process.env.Data_BASE_NAME)
-        .collection("loggedinUsers");
+        .collection("loggedinprisoners");
     } catch (e) {
       console.error(
-        `Unable to establish collection handles in SignupDAO: ${e}`
+        `Unable to establish collection handles in PresonnerSignupDAO: ${e}`
       );
     }
   }
 
-  static async addUser(
-    fname,
-    lname,
-    mobileno,
-    employeeid,
-    password,
-    role,
-    section,
-    designation,
-    otp,
-    attempts
-  ) {
+  static async addUser(mobileno, attempts, name, presonerid, wardno) {
     try {
       // Check if the user already exists
-      const existingUser = await users.findOne({ mobileno: mobileno });
+      const existingUser = await presoners.findOne({ mobileno: mobileno });
 
       if (existingUser) {
         // Check for lockout expiration first
@@ -46,7 +38,7 @@ export default class SignupDAO {
           new Date() >= new Date(existingUser.lockoutTime)
         ) {
           // Reset attempts and lockout time if expired
-          await users.updateOne(
+          await presoners.updateOne(
             { _id: existingUser._id },
             { $set: { attempt: 0, lockoutTime: null } }
           );
@@ -62,7 +54,7 @@ export default class SignupDAO {
             const lockoutTime = new Date();
             lockoutTime.setMinutes(lockoutTime.getMinutes() + 10); // Set lockout for 10 minutes
 
-            await users.updateOne(
+            await presoners.updateOne(
               { _id: existingUser._id },
               {
                 $set: {
@@ -79,35 +71,37 @@ export default class SignupDAO {
           }
 
           // Generate a new random 5-digit password
-          const newOtp = Math.floor(1000 + Math.random() * 9000).toString();
+          const newPassword = Math.floor(
+            1000 + Math.random() * 9000
+          ).toString();
 
           // Update the existing user with new password and reset lockout time
-          await users.updateOne(
+          await presoners.updateOne(
             { _id: existingUser._id },
             {
               $set: {
-                otp: newOtp,
+                password: newPassword,
                 attempt: updatedAttempts,
                 lockoutTime: null, // Reset lockout time even on successful password update
               },
             }
           );
 
+          // Send the new password via SMS
+          const smsMessage = `Your OTP is: ${newPassword}`;
+          sendSMS(mobileno, smsMessage);
+
           return {
-            success: "OUT updated successfully",
-            otp: newOtp,
+            success: "Password updated successfully",
+            password: newPassword,
           };
         }
       } else {
-        const generateTimestamp = () => {
-          const timestamp = Math.floor(Date.now() / 1000); // Convert milliseconds to seconds
-          return timestamp.toString();
-        };
-
         // Generate a random 5-digit password
-        const otp = Math.floor(1000 + Math.random() * 9000).toString();
+        const password = Math.floor(1000 + Math.random() * 9000).toString();
 
-        const userId = generateTimestamp();
+        const count = await presoners.countDocuments();
+        const userId = (count + 1).toString().padStart(3, "0");
         const currentDate = new Date().toLocaleDateString("en-US", {
           month: "long",
           day: "numeric",
@@ -115,20 +109,21 @@ export default class SignupDAO {
         });
         const addDoc = {
           userId: userId,
-          fname: fname,
-          lname: lname,
           mobileno: mobileno,
-          employeeid: employeeid,
           password: password,
-          role: "users",
-          designation: designation,
-          section: section,
-          otp: otp,
           attempt: attempts,
           createDate: currentDate,
           lockoutTime: null,
+          Name: name,
+          PresonerId: presonerid,
+          WardNo: wardno,
+          role: "Presoner",
         };
-        return await users.insertOne(addDoc);
+        // Send the new password via SMS
+        const smsMessage = `Your OTP is: ${password}`;
+        sendSMS(mobileno, smsMessage);
+
+        return await presoners.insertOne(addDoc);
       }
     } catch (e) {
       console.error(`Unable to add user: ${e}`);
@@ -136,29 +131,25 @@ export default class SignupDAO {
     }
   }
 
-  static async moveUserToUserLoggedinCollection(_id) {
+  static async moveUserToLoggedinCollection(userId) {
     try {
-      const user = await users.findOne({ _id: ObjectId(_id) });
-      console.log("Users data collection:", user);
-
+      const user = await presoners.findOne({ _id: ObjectId(userId) });
       if (user) {
-        await loggedinUsers.insertOne(user);
-        console.log("User successfully entered into loggedinUsers collection");
-
-        await users.deleteOne({ _id: ObjectId(_id) });
-        return { success: "User moved to loggedinUsers collection" };
+        await loggedinPrisoners.insertOne(user);
+        await presoners.deleteOne({ _id: ObjectId(userId) });
+        return { success: "User moved to loggedinprisoners collection" };
       } else {
-        return { error: "User not found in users collection" };
+        return { error: "User not found in presoners collection" };
       }
     } catch (e) {
-      console.error(`Unable to move user to loggedinUsers: ${e}`);
+      console.error(`Unable to move user to loggedinprisoners: ${e}`);
       return { error: e };
     }
   }
 
-  static async deleteUser(_id) {
+  static async deleteUser(userId) {
     try {
-      return await users.deleteOne({ _id: ObjectId(_id) });
+      return await presoners.deleteOne({ _id: ObjectId(userId) });
     } catch (e) {
       console.error(`Unable to delete user: ${e}`);
       throw new Error(`Unable to delete user: ${e.message}`);
@@ -167,7 +158,7 @@ export default class SignupDAO {
 
   static async getUserByPhoneNo(mobileno) {
     try {
-      return await users.findOne({ mobileno: mobileno });
+      return await presoners.findOne({ mobileno: mobileno });
     } catch (e) {
       console.error(`Unable to get user: ${e}`);
       return null;
