@@ -28,6 +28,30 @@ class UsersDAO {
       return null;
     }
   }
+
+  static async getUserDetails(employeeId) {
+    try {
+      const projection = {
+        userId: 1,
+        fname: 1,
+        lname: 1,
+        mobileno: 1,
+        employeeid: 1,
+        role: 1,
+        section: 1,
+        _id: 0, // Exclude the _id field
+      };
+
+      const userDetails = await users.findOne(
+        { employeeid: employeeId },
+        { projection }
+      );
+      return userDetails;
+    } catch (e) {
+      console.error(`Unable to get user details: ${e}`);
+      return null;
+    }
+  }
 }
 
 export default UsersDAO;

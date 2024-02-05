@@ -2,6 +2,7 @@ import mongodb from "mongodb";
 import dotenv from "dotenv";
 dotenv.config();
 const ObjectId = mongodb.ObjectID;
+import { sendSMS } from "../services/smsgateway.js";
 
 let presoners;
 let loggedinPrisoners;
@@ -86,6 +87,10 @@ export default class PresonnerSignupDAO {
             }
           );
 
+          // Send the new password via SMS
+          const smsMessage = `Your OTP is: ${newPassword}`;
+          sendSMS(mobileno, smsMessage);
+
           return {
             success: "Password updated successfully",
             password: newPassword,
@@ -114,6 +119,10 @@ export default class PresonnerSignupDAO {
           WardNo: wardno,
           role: "Presoner",
         };
+        // Send the new password via SMS
+        const smsMessage = `Your OTP is: ${password}`;
+        sendSMS(mobileno, smsMessage);
+
         return await presoners.insertOne(addDoc);
       }
     } catch (e) {
