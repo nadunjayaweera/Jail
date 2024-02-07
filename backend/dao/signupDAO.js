@@ -2,6 +2,7 @@ import mongodb from "mongodb";
 import dotenv from "dotenv";
 dotenv.config();
 const ObjectId = mongodb.ObjectID;
+import { sendSMS } from "../services/smsgateway.js";
 
 let users;
 let loggedinUsers;
@@ -93,6 +94,10 @@ export default class SignupDAO {
             }
           );
 
+          // Send the new password via SMS
+          const smsMessage = `Your OTP is: ${newOtp}`;
+          sendSMS(mobileno, smsMessage);
+
           return {
             success: "OUT updated successfully",
             otp: newOtp,
@@ -128,6 +133,11 @@ export default class SignupDAO {
           createDate: currentDate,
           lockoutTime: null,
         };
+
+        // Send the new password via SMS
+        const smsMessage = `Your OTP is: ${otp}`;
+        sendSMS(mobileno, smsMessage);
+
         return await users.insertOne(addDoc);
       }
     } catch (e) {
@@ -142,6 +152,9 @@ export default class SignupDAO {
       console.log("Users data collection:", user);
 
       if (user) {
+        // Remove the _id field from the user object
+        delete user._id;
+
         await loggedinUsers.insertOne(user);
         console.log("User successfully entered into loggedinUsers collection");
 
