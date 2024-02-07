@@ -1,4 +1,3 @@
-// data.controller.mjs
 import sharp from "sharp";
 import DataDAO from "../dao/dataDAO.js";
 

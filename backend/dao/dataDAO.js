@@ -1,5 +1,6 @@
 import mongodb from "mongodb";
 import dotenv from "dotenv";
+import { sendSaleSMS } from "../services/smsgateway.js";
 dotenv.config();
 const ObjectId = mongodb.ObjectID;
 
@@ -101,6 +102,16 @@ export default class DataDAO {
       };
 
       const result = await sale.insertOne(sales);
+
+      // Send SMS
+      await sendSaleSMS(
+        customerName,
+        products,
+        totalPrice,
+        paymentmethod,
+        mobileno,
+        formattedOrderId
+      );
 
       // Fetch and log menu details for each product in the order
       for (const product of products) {

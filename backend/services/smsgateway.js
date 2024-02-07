@@ -53,7 +53,7 @@ async function sendSMS(phoneNumber, message) {
       smsData,
       {
         headers: {
-          //   Authorization: `Bearer ${authToken}`,
+          Authorization: `Bearer ${authToken}`,
         },
       }
     );
@@ -64,4 +64,41 @@ async function sendSMS(phoneNumber, message) {
   }
 }
 
-export { sendSMS };
+async function sendSaleSMS(
+  customerName,
+  products,
+  totalPrice,
+  paymentMethod,
+  mobileNo,
+  orderId
+) {
+  try {
+    // Construct the message for the sale
+    let message = `Your order:\n`;
+    message += `Customer: ${customerName}\n`;
+    message += `OrderID: ${orderId}\n`;
+
+    // Expand product details
+    message += "Products:\n";
+    for (let i = 0; i < products.length; i++) {
+      const product = products[i];
+      message += `${i + 1}.\n`;
+      message += `Product Name: ${product.productName}\n`;
+      message += `Item ID: ${product.itemid}\n`;
+      message += `Date: ${product.date}\n`;
+      message += `Meal: ${product.meal}\n`;
+      message += `Price: ${product.price}\n`;
+    }
+
+    message += `Total Price: ${totalPrice}\n`;
+    message += `Payment Method: ${paymentMethod}`;
+
+    // Send the SMS
+    await sendSMS(mobileNo, message);
+    console.log("SMS message:", message);
+  } catch (error) {
+    console.error("Error sending sale SMS:", error.message);
+  }
+}
+
+export { sendSMS, sendSaleSMS };
