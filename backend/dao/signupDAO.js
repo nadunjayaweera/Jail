@@ -186,4 +186,31 @@ export default class SignupDAO {
       return null;
     }
   }
+
+  static async getUserByEmployeeIdFromLoggedinUsers(employeeId) {
+    try {
+      const user = await loggedinUsers.findOne({ employeeid: employeeId });
+      return user;
+    } catch (e) {
+      console.error(
+        `Unable to get user by employeeId from loggedinUsers: ${e}`
+      );
+      return null;
+    }
+  }
+
+  static async updateUserByEmployeeIdInLoggedinUsers(employeeId, updatedData) {
+    try {
+      const result = await loggedinUsers.updateOne(
+        { employeeid: employeeId },
+        { $set: updatedData }
+      );
+      return result.modifiedCount > 0;
+    } catch (e) {
+      console.error(
+        `Unable to update user by employeeId in loggedinUsers: ${e}`
+      );
+      return false;
+    }
+  }
 }

@@ -39,6 +39,7 @@ class UsersDAO {
         employeeid: 1,
         role: 1,
         section: 1,
+        designation: 1,
         _id: 1,
       };
 

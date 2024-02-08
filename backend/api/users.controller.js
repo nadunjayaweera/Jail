@@ -38,7 +38,13 @@ export async function getUserDetails(req, res) {
 
 export async function updateUser(req, res) {
   try {
-    const { employeeId } = req.params; // Assuming userId is passed as a URL parameter
+    const { employeeId } = req.query; // Access employeeId from req.query
+    console.log("EmployeeID:", employeeId);
+    if (!employeeId) {
+      return res
+        .status(400)
+        .json({ message: "Employee ID is required in query parameters" });
+    }
     const updatedData = req.body; // Updated user data from request body
 
     const success = await UsersDAO.updateUser(employeeId, updatedData);
